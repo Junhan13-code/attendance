@@ -571,9 +571,9 @@
         html = `<div class="form-group"><label>Symptoms</label><input id="d1" placeholder="Fever, headache"></div>
                 <div class="form-group"><label>Location</label><input id="d2" placeholder="Choa Chu Kang Polyclinic"></div>`;
       } else if (status === 'MC') {
-        const today = new Date().toISOString().split('T')[0];
-        html = `<div class="form-group"><label>Start Date</label><input type="date" id="d1" min="${today}"></div>
-                <div class="form-group"><label>End Date</label><input type="date" id="d2" min="${today}"></div>`;
+        // Removed min="${today}" to allow past dates
+        html = `<div class="form-group"><label>Start Date</label><input type="date" id="d1"></div>
+                <div class="form-group"><label>End Date</label><input type="date" id="d2"></div>`;
       } else if (status === 'RSI') {
         html = `<div class="form-group"><label>Symptoms</label><input id="d1" placeholder="Describe symptoms"></div>`;
       } else if (status === 'Late') {
@@ -604,12 +604,48 @@
         return showToast("Both start and end dates are required for MC", true);
       }
       
-      logAttendance({ 
-        status: currentStatus, 
-        details: d1, 
-        info: d2 
-      });
+      if (currentStatus === 'MC') {
+          // Validate dates are in correct format (YYYY-MM-DD from input type=date)
+          const startDate = new Date(d1);
+          const endDate = new Date(d2);
+          
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+              return showToast("Please enter valid dates for MC", true);
+          }
+          
+          if (endDate < startDate) {
+              return showToast("End date cannot be before start date", true);
+          }
+          
+          // Format dates for details: DDMMYY
+          const startFormatted = formatDateForDetails(startDate);
+          const endFormatted = formatDateForDetails(endDate);
+          const detailsForMC = `${startFormatted} - ${endFormatted}`;
+          
+          logAttendance({ 
+            status: currentStatus, 
+            details: detailsForMC, // Use the formatted date range
+            info: "N/A" 
+          });
+      } else {
+          logAttendance({ 
+            status: currentStatus, 
+            details: d1, 
+            info: d2 
+          });
+      }
+      
       cancelForm();
+    }
+
+    // Helper function to format date as DDMMYY
+    function formatDateForDetails(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        const year = String(date.getFullYear());
+        // Extract last two digits of the year
+        const shortYear = year.substring(2);
+        return `${day}${month}${shortYear}`;
     }
 
     function logAttendance(data) {
@@ -625,7 +661,7 @@
         name: currentUser.name,
         email: currentUser.email,
         status: data.status,
-        details: data.details,
+        details: data.details, // This will be the DDMMYY-DDMMYY string for MC
         info: data.info,
         date: todayStr,
         time: timeStr,
@@ -699,6 +735,7 @@
                       details.RSO.push(`${log.name} (${log.details})`);
                     } else if (log.status === 'MC') {
                       counts['MC(Ag-)']++;
+                      // Format MC details as: Name (DDMMYY - DDMMYY)
                       details['MC(Ag-)'].push(`${log.name} (${log.details})`);
                     } else if (log.status === 'Leave') {
                       counts.LEAVE++;
@@ -720,7 +757,7 @@ RSI: ${counts.RSI}`;
                   text += `\nRSO: ${counts.RSO}`;
                   details.RSO.forEach(d => text += `\n${d}`);
                   text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
-                  details['MC(Ag-)'].forEach(d => text += `\n${d}`);
+                  details['MC(Ag-)'].forEach(d => text += `\n${d}`); // This now shows "Name (DDMMYY - DDMMYY)"
                   text += `\nMC(Ag+): ${counts['MC(Ag+)']}
 HL: ${counts.HL}
 OIL: ${counts.OIL}
@@ -809,7 +846,7 @@ LATE: ${counts.LATE}`;
             showScreen('registerScreen');
           }
         }).catch(err => {
-          console.error("Error loading user data:", err);
+          console.error("Error loading user ", err);
           showToast("Failed to load user data", true);
         });
       } else {
