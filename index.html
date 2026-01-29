@@ -336,6 +336,10 @@
           <button class="btn btn-purple" onclick="openForm('RSI')">RSI</button>
           <button class="btn btn-gray" onclick="openForm('Late')">Late</button>
           <button class="btn btn-primary" onclick="openForm('Leave')">Leave</button>
+          <!-- Added buttons for HL, OIL, OTH -->
+          <button class="btn btn-gray" onclick="openForm('HL')">HL</button>
+          <button class="btn btn-gray" onclick="openForm('OIL')">OIL</button>
+          <button class="btn btn-gray" onclick="openForm('OTH')">OTH</button>
         </div>
         <div id="dynamicForm" style="display:none; margin-top:20px;">
           <h3 id="formTitle"></h3>
@@ -570,8 +574,7 @@
       if (status === 'RSO') {
         html = `<div class="form-group"><label>Symptoms</label><input id="d1" placeholder="Fever, headache"></div>
                 <div class="form-group"><label>Location</label><input id="d2" placeholder="Choa Chu Kang Polyclinic"></div>`;
-      } else if (status === 'MC') {
-        // Removed min="${today}" to allow past dates
+      } else if (['MC', 'HL', 'OIL'].includes(status)) { // Handle date ranges for MC, HL, OIL
         html = `<div class="form-group"><label>Start Date</label><input type="date" id="d1"></div>
                 <div class="form-group"><label>End Date</label><input type="date" id="d2"></div>`;
       } else if (status === 'RSI') {
@@ -582,6 +585,8 @@
       } else if (status === 'Leave') {
         html = `<div class="form-group"><label>Type</label>
                 <select id="d1"><option value="">-- Select --</option><option>Full-Day</option><option>Half-Day (AM)</option><option>Half-Day (PM)</option></select></div>`;
+      } else if (status === 'OTH') {
+          html = `<div class="form-group"><label>Specify</label><input id="d1" placeholder="e.g. Compassionate Leave, Marriage"></div>`;
       }
       
       fields.innerHTML = html;
@@ -596,21 +601,21 @@
       const d1 = document.getElementById('d1')?.value?.trim() || "";
       const d2 = document.getElementById('d2')?.value?.trim() || "N/A";
       
-      if (!d1 && ['RSO','RSI','Late','Leave'].includes(currentStatus)) {
+      if (!d1 && ['RSO','RSI','Late','Leave', 'OTH'].includes(currentStatus)) {
         return showToast("Please fill required field", true);
       }
       
-      if (currentStatus === 'MC' && (!d1 || !d2)) {
-        return showToast("Both start and end dates are required for MC", true);
+      if (['MC', 'HL', 'OIL'].includes(currentStatus) && (!d1 || !d2)) {
+        return showToast(`Both start and end dates are required for ${currentStatus}`, true);
       }
       
-      if (currentStatus === 'MC') {
+      if (['MC', 'HL', 'OIL'].includes(currentStatus)) {
           // Validate dates are in correct format (YYYY-MM-DD from input type=date)
           const startDate = new Date(d1);
           const endDate = new Date(d2);
           
           if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-              return showToast("Please enter valid dates for MC", true);
+              return showToast(`Please enter valid dates for ${currentStatus}`, true);
           }
           
           if (endDate < startDate) {
@@ -620,11 +625,11 @@
           // Format dates for details: DDMMYY
           const startFormatted = formatDateForDetails(startDate);
           const endFormatted = formatDateForDetails(endDate);
-          const detailsForMC = `${startFormatted} - ${endFormatted}`;
+          const detailsForStatus = `${startFormatted} - ${endFormatted}`;
           
           logAttendance({ 
             status: currentStatus, 
-            details: detailsForMC, // Use the formatted date range
+            details: detailsForStatus, // Use the formatted date range
             info: "N/A" 
           });
       } else {
@@ -656,20 +661,50 @@
       const todayStr = `${day}/${month}/${year}`;
       const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
 
+      // Prepare date range for statuses that require it
+      let startDateISO = null;
+      let endDateISO = null;
+      if (['MC', 'HL', 'OIL'].includes(data.status)) {
+          // Parse the formatted date range string back to ISO for storage
+          const dateParts = data.details.split(' - ');
+          if (dateParts.length === 2) {
+              // Assuming format DDMMYY
+              const startPart = dateParts[0];
+              const endPart = dateParts[1];
+              const startDay = startPart.substring(0, 2);
+              const startMonth = startPart.substring(2, 4);
+              const startYear = '20' + startPart.substring(4); // Assumes 20xx century
+              const endDay = endPart.substring(0, 2);
+              const endMonth = endPart.substring(2, 4);
+              const endYear = '20' + endPart.substring(4);
+
+              startDateISO = new Date(Date.UTC(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay))).toISOString();
+              endDateISO = new Date(Date.UTC(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay))).toISOString();
+          }
+      }
+
       db.collection("attendance_logs").add({
         uid: currentUser.uid,
         name: currentUser.name,
         email: currentUser.email,
         status: data.status,
-        details: data.details, // This will be the DDMMYY-DDMMYY string for MC
+        details: data.details, // This will be the DDMMYY-DDMMYY string for MC/HL/OIL, or description for others
         info: data.info,
-        date: todayStr,
-        time: timeStr,
+        date: todayStr, // Date of submission
+        time: timeStr, // Time of submission
+        startDate: startDateISO, // Store the start date of the range (if applicable)
+        endDate: endDateISO,     // Store the end date of the range (if applicable)
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         showToast("✅ Submitted!");
-        generateParadeState();
-        generateMissingList();
+        // Force refresh of parade state after submission
+        if (document.getElementById('paradeTab').style.display === 'block') {
+            generateParadeState();
+        }
+        // Force refresh of missing list after submission
+         if (document.getElementById('missingTab').style.display === 'block') {
+            generateMissingList();
+        }
       }).catch(err => {
         console.error("Submission error:", err);
         showToast("Submission failed: " + err.message, true);
@@ -701,32 +736,57 @@
             .then(userSnap => {
               const totalStrength = userSnap.size;
 
-              // Step 3: Get TODAY'S attendance logs
+              // Step 3: Get TODAY'S attendance logs (considering date ranges)
               return db.collection("attendance_logs")
-                .where("date", "==", todayStr)
+                .orderBy("timestamp", "desc") // Order by timestamp descending to get latest first
                 .get()
                 .then(logSnap => {
-                  // Deduplicate by UID (latest per user)
-                  const logs = [];
+                  // Group logs by UID and take the first one (latest due to order)
+                  const latestLogsByUid = {};
                   logSnap.forEach(doc => {
                     const data = doc.data();
-                    if (!logs.some(l => l.uid === data.uid)) {
-                      logs.push(data);
+                    const uid = data.uid;
+                    // Only consider logs relevant to TODAY'S parade state
+                    // Check if the log's submission date is today OR if it has a date range that includes today
+                    const submissionDateMatches = data.date === todayStr;
+                    const dateRangeIncludesToday = data.startDate && data.endDate;
+                    if (submissionDateMatches || dateRangeIncludesToday) {
+                        if (!latestLogsByUid[uid]) {
+                            // If this is the first log seen for this UID, store it
+                            latestLogsByUid[uid] = data;
+                        } // Otherwise, skip (as logs are ordered desc, first seen is latest)
                     }
                   });
 
-                  // Step 4: Count statuses
+                  // Convert object back to array
+                  const logs = Object.values(latestLogsByUid);
+
+                  // Step 4: Count statuses based on the latest log for each user on/for today
                   const counts = { 
                     MA: 0, RSI: 0, RSO: 0, 'MC(Ag-)': 0, 'MC(Ag+)': 0, 
-                    HL: 0, OIL: 0, LEAVE: 0, OTH: 0, LATE: 0 
+                    HL: 0, OIL: 0, LEAVE: 0, OTH: 0, LATE: 0
                   };
                   const details = { 
-                    RSI: [], RSO: [], 'MC(Ag-)': [], LEAVE: [], LATE: [] 
+                    RSI: [], RSO: [], 'MC(Ag-)': [], LEAVE: [], LATE: [], HL: [], OIL: [], OTH: []
                   };
+                  let presentCount = 0; // Count of Present separately
 
                   logs.forEach(log => {
+                    // Check if the log's date range includes today (or if it's a same-day submission)
+                    const isSameDaySubmission = log.date === todayStr;
+                    const isInRange = log.startDate && log.endDate;
+                    const isActiveToday = isSameDaySubmission || (
+                        new Date(log.startDate).getTime() <= now.getTime() &&
+                        new Date(log.endDate).getTime() >= now.getTime()
+                    );
+
+                    if (!isActiveToday) {
+                        // If the latest log is not active today, it doesn't contribute to today's parade state
+                        return;
+                    }
+
                     if (log.status === 'Present') {
-                      counts.MA++;
+                      presentCount++; // Increment Present Strength
                     } else if (log.status === 'RSI') {
                       counts.RSI++;
                       details.RSI.push(`${log.name} (${log.details})`);
@@ -735,7 +795,6 @@
                       details.RSO.push(`${log.name} (${log.details})`);
                     } else if (log.status === 'MC') {
                       counts['MC(Ag-)']++;
-                      // Format MC details as: Name (DDMMYY - DDMMYY)
                       details['MC(Ag-)'].push(`${log.name} (${log.details})`);
                     } else if (log.status === 'Leave') {
                       counts.LEAVE++;
@@ -743,7 +802,17 @@
                     } else if (log.status === 'Late') {
                       counts.LATE++;
                       details.LATE.push(`${log.name} (${log.details})`);
+                    } else if (log.status === 'HL') { // Added HL
+                      counts.HL++;
+                      details.HL.push(`${log.name} (${log.details})`);
+                    } else if (log.status === 'OIL') { // Added OIL
+                      counts.OIL++;
+                      details.OIL.push(`${log.name} (${log.details})`);
+                    } else if (log.status === 'OTH') { // Added OTH
+                      counts.OTH++;
+                      details.OTH.push(`${log.name} (${log.details})`);
                     }
+                    // MA is manual (from ref code), so it's not incremented here by user submission
                   });
 
                   // Step 5: Generate parade state text
@@ -757,16 +826,19 @@ RSI: ${counts.RSI}`;
                   text += `\nRSO: ${counts.RSO}`;
                   details.RSO.forEach(d => text += `\n${d}`);
                   text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
-                  details['MC(Ag-)'].forEach(d => text += `\n${d}`); // This now shows "Name (DDMMYY - DDMMYY)"
-                  text += `\nMC(Ag+): ${counts['MC(Ag+)']}
-HL: ${counts.HL}
-OIL: ${counts.OIL}
-LEAVE: ${counts.LEAVE}`;
+                  details['MC(Ag-)'].forEach(d => text += `\n${d}`);
+                  text += `\nMC(Ag+): ${counts['MC(Ag+)']}`;
+                  text += `\nHL: ${counts.HL}`; // Added HL
+                  details.HL.forEach(d => text += `\n${d}`); // Added HL details
+                  text += `\nOIL: ${counts.OIL}`; // Added OIL
+                  details.OIL.forEach(d => text += `\n${d}`); // Added OIL details
+                  text += `\nLEAVE: ${counts.LEAVE}`;
                   details.LEAVE.forEach(d => text += `\n${d}`);
-                  text += `\nOTH: ${counts.OTH}
-LATE: ${counts.LATE}`;
+                  text += `\nOTH: ${counts.OTH}`; // Added OTH
+                  details.OTH.forEach(d => text += `\n${d}`); // Added OTH details
+                  text += `\nLATE: ${counts.LATE}`;
                   details.LATE.forEach(d => text += `\n${d}`);
-                  text += `\nPresent Strength: ${counts.MA}`;
+                  text += `\nPresent Strength: ${presentCount}`;
 
                   output.textContent = text;
                   btnText.textContent = "🔄 Generate Parade State";
@@ -779,6 +851,7 @@ LATE: ${counts.LATE}`;
           btnText.textContent = "🔄 Generate Parade State";
         });
     }
+
 
     // --- Missing Attendance ---
     function generateMissingList() {
@@ -796,12 +869,38 @@ LATE: ${counts.LATE}`;
         const allUsers = userSnap.docs.map(d => ({ uid: d.id, name: d.data().name }));
         
         return db.collection("attendance_logs")
-          .where("date", "==", todayStr)
+          .orderBy("timestamp", "desc") // Order by timestamp descending
           .get()
           .then(logSnap => {
-            const presentUids = new Set(logSnap.docs.map(d => d.data().uid));
-            const missing = allUsers.filter(u => !presentUids.has(u.uid)).map(u => u.name);
-            
+             // Group logs by UID and take the first one (latest due to order)
+             const latestLogsByUid = {};
+             logSnap.forEach(doc => {
+                 const data = doc.data();
+                 const uid = data.uid;
+                 if (!latestLogsByUid[uid]) {
+                     latestLogsByUid[uid] = data;
+                 }
+             });
+
+             const presentUids = new Set();
+
+             // Iterate through latest logs to determine who is present today
+             Object.values(latestLogsByUid).forEach(log => {
+                 // Check if the log's date range includes today (or if it's a same-day submission)
+                 const isSameDaySubmission = log.date === todayStr;
+                 const isInRange = log.startDate && log.endDate;
+                 const isActiveToday = isSameDaySubmission || (
+                     new Date(log.startDate).getTime() <= today.getTime() &&
+                     new Date(log.endDate).getTime() >= today.getTime()
+                 );
+
+                 if (isActiveToday) {
+                     presentUids.add(log.uid); // Add UID if active today
+                 }
+             });
+
+             const missing = allUsers.filter(u => !presentUids.has(u.uid)).map(u => u.name);
+             
             output.textContent = missing.length > 0 
               ? missing.join('\n') 
               : "All personnel have submitted.";
