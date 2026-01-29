@@ -6,13 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- TODO: Add Firebase SDK Scripts here -->
-  <!-- Example (replace with your actual Firebase config from the console): -->
-  <!--
+  <!-- Firebase SDK Scripts (Corrected URLs without trailing spaces) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  -->
 
   <style>
     :root { --primary: #2563eb; --bg: #f8fafc; }
@@ -100,7 +97,7 @@
       padding: 10px;
       border: none;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight:600;
       cursor: pointer;
       margin-top: 10px;
       width: 100%;
@@ -137,7 +134,7 @@
       padding: 10px;
       border: none;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight:600;
       cursor: pointer;
       flex: 1;
     }
@@ -152,7 +149,7 @@
       padding: 10px;
       border: none;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight:600;
       cursor: pointer;
       margin-top: 10px;
       width: 100%;
@@ -182,7 +179,7 @@
       padding: 10px;
       border: none;
       border-radius: 6px;
-      font-weight: 600;
+      font-weight:600;
       cursor: pointer;
       flex: 1;
     }
@@ -205,29 +202,99 @@
       max-height: 400px;
       overflow-y: auto;
     }
+
+    /* Style for login buttons */
+    .login-buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .login-btn {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .login-btn:hover {
+      opacity: 0.9;
+    }
+    .login-btn.google { background: #4285F4; }
+    .login-btn.phone { background: #34A853; }
+    .login-btn.email { background: #EA4335; }
+
   </style>
 </head>
 <body>
-  <!-- Role Selection Modal -->
-  <div id="roleSelectionModal" class="modal-overlay" style="display: flex;">
+  <!-- Removed the old role selection modal -->
+  <!-- <div id="roleSelectionModal" class="modal-overlay" style="display: flex;">
     <div class="modal-content">
       <h3>Select Your Role</h3>
       <button class="btn-trainee" onclick="selectRole('trainee')" style="background:#2563eb; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Trainee</button>
       <button class="btn-instructor" onclick="selectRole('instructor')" style="background:#dc2626; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Instructor</button>
     </div>
-  </div>
+  </div> -->
 
   <div class="container" id="mainApp" style="display:none;">
     <h2>Firebase Attendance App</h2> <!-- Placeholder Title -->
     <p style="text-align:center; font-size:0.85rem; color:#64748b; margin:0 0 20px;">Made by 56th Mech Tribe 5</p>
-    <div class="tab-nav">
-      <button class="tab-button active" onclick="switchTab('attendance')">Attendance</button>
-      <button class="tab-button" onclick="switchTab('parade')">Parade State</button>
-      <button class="tab-button" onclick="switchTab('missing')">Missing Attendance</button>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="center-box">
+      <div class="big-icon">🔐</div>
+      <h3>Sign In</h3>
+      <p>Please choose a login method.</p>
+      <div class="login-buttons-container">
+        <button class="login-btn google" onclick="signInWithGoogle()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+          Sign in with Google
+        </button>
+        <button class="login-btn phone" onclick="signInWithPhone()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 4h10v16H7V4zm2 14h6v-1H9v1zm0-3h6v-1H9v1zm0-3h6V9H9v3z"/></svg>
+          Sign in with Phone
+        </button>
+        <button class="login-btn email" onclick="showEmailSignIn()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Sign in with Email
+        </button>
+      </div>
     </div>
 
-    <!-- Attendance Tab -->
-    <div id="attendance-tab" class="tab-content active">
+    <!-- Email Sign-In Modal -->
+    <div id="emailSignInModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Sign in with Email</h3>
+        <input type="email" id="emailInput" placeholder="Enter your email" style="margin-bottom: 10px; width: 100%;">
+        <input type="password" id="passwordInput" placeholder="Enter your password" style="margin-bottom: 10px; width: 100%;">
+        <button class="btn-confirm" onclick="performEmailSignIn()">Sign In</button>
+        <button class="btn-cancel" onclick="closeModal('emailSignInModal')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Phone Sign-In Modal -->
+    <div id="phoneSignInModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Sign in with Phone</h3>
+        <input type="tel" id="phoneInput" placeholder="+1234567890" style="margin-bottom: 10px; width: 100%;">
+        <button class="btn-confirm" onclick="sendPhoneVerification()">Send Verification Code</button>
+        <div id="verificationCodeSection" style="display: none;">
+          <input type="text" id="verificationCodeInput" placeholder="Enter verification code" style="margin-top: 10px; width: 100%;">
+          <button class="btn-confirm" onclick="verifyPhoneCode()">Verify Code</button>
+        </div>
+        <button class="btn-cancel" onclick="closeModal('phoneSignInModal')">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Attendance Tab (initially hidden until logged in) -->
+    <div id="attendance-tab" class="tab-content">
       <div id="loadingState" style="padding:40px 0; text-align:center;">Verifying identity...</div>
       <div id="registerState" class="hidden center-box">
         <div class="big-icon">👋</div>
@@ -259,7 +326,7 @@
       <div id="statusMsg"></div>
     </div>
 
-    <!-- Missing Attendance Tab -->
+    <!-- Missing Attendance Tab (initially hidden until logged in) -->
     <div id="missing-tab" class="tab-content">
       <div class="missing-attendance-container">
         <h3 style="margin:0 0 12px;">Current Missing Attendance</h3>
@@ -277,7 +344,7 @@
       </div>
     </div>
 
-    <!-- Parade State Tab -->
+    <!-- Parade State Tab (initially hidden until logged in) -->
     <div id="parade-tab" class="tab-content">
       <div class="parade-state-container">
         <h3 style="margin:0 0 12px;">Current Parade State</h3>
@@ -300,11 +367,27 @@
         <h3>Confirm Submission</h3>
         <div class="summary-box" id="summaryContent"></div>
         <button class="btn-confirm" onclick="finalSubmit()">Yes, Submit</button>
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
       </div>
     </div>
 
     <script>
+      // Add your Firebase configuration HERE
+      const firebaseConfig = {
+        apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
+        authDomain: "attendance-idrus.firebaseapp.com",
+        projectId: "attendance-idrus",
+        storageBucket: "attendance-idrus.firebasestorage.app",
+        messagingSenderId: "561467450966",
+        appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
+        measurementId: "G-9TBLYGP4P5"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore(); // Initialize Firestore
+
       // --- Removed geolocation constants ---
       // const AFTC_LAT  = 1.3500;
       // const AFTC_LNG  = 103.8991;
@@ -314,6 +397,8 @@
       let currentStatus = "";
       let cachedParadeData = null;
       let cachedMissingData = null;
+      let confirmationPayload = {}; // Store payload for confirmation
+      let recaptchaVerifier = null; // Store Recaptcha verifier instance for phone auth
 
       // --- Removed old handlePresent function ---
       /*
@@ -359,19 +444,11 @@
 
       // --- Placeholder Functions for Firebase Integration ---
       // You will replace these with actual Firebase SDK calls
-      const firebaseConfig = {
-        apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
-        authDomain: "attendance-idrus.firebaseapp.com",
-        projectId: "attendance-idrus",
-        storageBucket: "attendance-idrus.firebasestorage.app",
-        messagingSenderId: "561467450966",
-        appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
-        measurementId: "G-9TBLYGP4P5"
-      };
+
       async function initializeAppWithAuth() {
         // This function should be called after Firebase SDK is loaded and initialized
         // It handles the auth state listener
-        firebase.auth().onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged(async (user) => {
           if (user) {
             // User is signed in
             console.log("User logged in:", user.uid, user.email);
@@ -380,49 +457,44 @@
           } else {
             // User is signed out
             console.log("No user logged in");
-            // Show login screen or redirect to auth page
-            // For now, just hide the app
-             document.getElementById('loadingState').textContent = "Please log in.";
-             document.getElementById('roleSelectionModal').style.display = 'none';
-             document.getElementById('mainApp').style.display = 'none';
+            // Show login screen
+            showLoginScreen();
           }
         });
       }
 
-      async function fetchUserDataFromFirestore(uid, email) {
-        // TODO: Implement Firestore call to get user details (name, role) based on UID
-        // Example pseudo-code:
-        // const docRef = doc(db, "users", uid);
-        // const docSnap = await getDoc(docRef);
-        // if (docSnap.exists()) {
-        //   const userData = docSnap.data();
-        //   currentUser.name = userData.name || "Unknown User";
-        //   currentUser.role = userData.role || "trainee";
-        //   currentUser.email = email; // From auth
-        //   currentUser.uid = uid;     // From auth
-        //   initApp(currentUser); // Continue app initialization
-        // } else {
-        //   // User not found in Firestore, might need registration step
-        //   currentUser.email = email;
-        //   currentUser.uid = uid;
-        //   showRegistrationPrompt(); // Show registration form if needed
-        // }
+      function showLoginScreen() {
+        document.getElementById('loadingState').textContent = "Please log in.";
+        document.getElementById('attendance-tab').classList.remove('active');
+        document.getElementById('parade-tab').classList.remove('active');
+        document.getElementById('missing-tab').classList.remove('active');
+        document.getElementById('loginScreen').style.display = 'block'; // Show login screen
+        document.getElementById('mainApp').style.display = 'block'; // Ensure main app is shown
+      }
 
-        // Placeholder: Simulate finding user data or needing registration
-        // Replace this with actual Firestore logic
-        const foundUser = true; // Simulate user found
-        if (foundUser) {
-          // Simulate fetched data
-          currentUser.name = "Simulated User Name"; // Replace with actual data from Firestore
-          currentUser.role = "trainee"; // Replace with actual data from Firestore
-          currentUser.email = email;
-          currentUser.uid = uid;
-          initApp(currentUser);
-        } else {
-          // User exists in Auth but not in Firestore, needs registration
-          currentUser.email = email;
-          currentUser.uid = uid;
-          showRegistrationPrompt();
+      async function fetchUserDataFromFirestore(uid, email) {
+        try {
+          const userDocRef = db.collection("users").doc(uid);
+          const docSnap = await userDocRef.get();
+
+          if (docSnap.exists) {
+            const userData = docSnap.data();
+            currentUser.name = userData.name || "Unknown User";
+            currentUser.role = userData.role || "trainee";
+            currentUser.email = email; // From auth
+            currentUser.uid = uid;     // From auth
+            initApp(currentUser); // Continue app initialization
+          } else {
+            // User not found in Firestore, needs registration step
+            currentUser.email = email;
+            currentUser.uid = uid;
+            showRegistrationPrompt();
+          }
+        } catch (error) {
+          console.error("Error fetching user data from Firestore:", error);
+          alert("Error loading user data. Please try again later.");
+          // Optionally, sign the user out if the error is critical
+          // await auth.signOut();
         }
       }
 
@@ -439,10 +511,13 @@
         if (identity.role === "unauthorized_instructor") {
           alert("You are not authorized as an instructor. Access denied.");
           document.getElementById('mainApp').style.display = 'none';
-          document.getElementById('roleSelectionModal').style.display = 'flex';
+          showLoginScreen(); // Show login screen again or handle as needed
           return;
         }
 
+        // Hide login screen and show main app structure
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('attendance-tab').classList.add('active'); // Show attendance tab by default
         document.getElementById('loadingState').classList.add('hidden');
         currentUser = identity; // Update global user object
         if (!identity.name || identity.name === "") { // Check if name is missing (needs registration)
@@ -459,26 +534,12 @@
       }
 
       // --- Modified selectRole to simulate role selection and trigger auth flow ---
-      function selectRole(role) {
-        // In a real scenario, role might be determined by Firestore data, not a client-side choice
-        // For now, store the intended role temporarily
-        currentUser.intendedRole = role;
+      // REMOVED selectRole function as it's no longer used
 
-        // Hide the role selection modal
-        document.getElementById('roleSelectionModal').style.display = 'none';
 
-        // Show loading state while checking auth
-        document.getElementById('loadingState').textContent = "Checking authentication...";
-
-        // Trigger the Firebase auth check flow
-        initializeAppWithAuth();
-      }
-
+      // Initialize the app when the page loads
       window.onload = () => {
-        // Initialize Firebase SDK here if not done elsewhere
-        // firebase.initializeApp(firebaseConfig); // Use your actual config
-        // Call the main initialization logic after SDK loads
-        // initializeAppWithAuth(); // Uncomment after adding Firebase SDK
+         initializeAppWithAuth(); // Start the auth check flow after Firebase is initialized
       };
 
       // --- Updated functions to remove google.script.run ---
@@ -610,26 +671,33 @@
         // TODO: Replace with Firebase call to save user name and role to Firestore
         console.log("Registering user:", name, currentUser.uid, currentUser.intendedRole);
         // Example: Save to Firestore
-        // const userRef = doc(db, "users", currentUser.uid);
-        // await setDoc(userRef, {
-        //   name: name,
-        //   email: currentUser.email,
-        //   role: currentUser.intendedRole, // Use the role selected earlier
-        //   registeredAt: new Date() // Timestamp
-        // });
-        // currentUser.name = name; // Update local state
-        // currentUser.role = currentUser.intendedRole; // Update local state
-        // initApp(currentUser); // Re-initialize app with new data
-        // alert("Setup successful!");
+        const userRef = db.collection("users").doc(currentUser.uid);
+        userRef.set({
+          name: name,
+          email: currentUser.email,
+          role: currentUser.intendedRole || "trainee", // Use the role selected earlier or default
+          registeredAt: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
+        }).then(() => {
+          console.log("User registered in Firestore successfully!");
+          currentUser.name = name; // Update local state
+          currentUser.role = currentUser.intendedRole || "trainee"; // Update local state
+          initApp(currentUser); // Re-initialize app with new data
+          alert("Setup successful!");
+        }).catch((error) => {
+          console.error("Error registering user in Firestore:", error);
+          alert("Registration failed. Please try again.");
+        }).finally(() => {
+            document.getElementById('mainApp').classList.remove('loading');
+        });
 
         // Placeholder: Simulate registration success
-        setTimeout(() => {
-          document.getElementById('mainApp').classList.remove('loading');
-          currentUser.name = name;
-          currentUser.role = currentUser.intendedRole; // Use the role selected earlier
-          initApp(currentUser);
-          alert("Setup successful!");
-        }, 1000);
+        // setTimeout(() => {
+        //   document.getElementById('mainApp').classList.remove('loading');
+        //   currentUser.name = name;
+        //   currentUser.role = currentUser.intendedRole; // Use the role selected earlier
+        //   initApp(currentUser);
+        //   alert("Setup successful!");
+        // }, 1000);
       }
 
       // --- Other functions remain largely the same, but calls inside need updating ---
@@ -752,8 +820,8 @@
       }
 
       function openConfirmation(data) {
+        confirmationPayload = data; // Store payload globally
         const modal = document.getElementById('confirmModal');
-        modal.dataset.payload = JSON.stringify(data);
         document.getElementById('summaryContent').innerHTML = `
           <div class="summary-item"><span class="summary-label">Name:</span> ${data.name}</div>
           <div class="summary-item"><span class="summary-label">Status:</span> ${data.status}</div>
@@ -764,37 +832,58 @@
       }
 
       function finalSubmit() {
-        const modal = document.getElementById('confirmModal');
-        const payload = JSON.parse(modal.dataset.payload || '{}');
-        closeModal();
+        // const modal = document.getElementById('confirmModal'); // Not needed as payload is global
+        // const payload = JSON.parse(modal.dataset.payload || '{}'); // Not needed as payload is global
+        const payload = confirmationPayload; // Use the global variable
+        closeModal('confirmModal');
 
         document.getElementById('mainApp').classList.add('loading');
 
         // TODO: Replace with Firebase call to process submission
         console.log("Submitting attendance:", payload);
         // Example: Save to Firestore logs collection
-        // const logEntry = {
-        //   timestamp: new Date(), // Server timestamp preferred
-        //   userId: currentUser.uid,
-        //   name: currentUser.name,
-        //   status: payload.status,
-        //   details: payload.details,
-        //   locationOrTime: payload.locationOrTime,
-        //   submittedBy: currentUser.uid
-        // };
-        // await addDoc(collection(db, "logs"), logEntry);
-        // Optionally, update attendance collection for the specific day/user
-        // await setDoc(doc(db, "attendance", `${new Date().toISOString().split('T')[0]}_${currentUser.uid}`), { ...logEntry });
-
-        // Placeholder: Simulate submission success
-        setTimeout(() => {
+        const logEntry = {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
+          userId: currentUser.uid,
+          name: currentUser.name,
+          status: payload.status,
+          details: payload.details,
+          locationOrTime: payload.locationOrTime,
+          submittedBy: currentUser.uid
+        };
+        db.collection("logs").add(logEntry).then((docRef) => {
+          console.log("Attendance logged successfully with ID: ", docRef.id);
+          // Optionally, update attendance collection for the specific day/user
+          const today = new Date().toISOString().split('T')[0];
+          const attendanceRef = db.collection("attendance").doc(`${today}_${currentUser.uid}`);
+          return attendanceRef.set({
+             ...logEntry,
+             date: today // Add date field
+          });
+        }).then(() => {
+          console.log("Attendance record updated in daily collection.");
+        }).catch((error) => {
+          console.error("Error submitting attendance:", error);
+          alert("Submission failed. Please try again.");
+        }).finally(() => {
           document.getElementById('mainApp').classList.remove('loading');
           alert("Submitted successfully ✓");
           document.getElementById('dynamicForm').style.display = 'none';
           document.getElementById('statusMsg').textContent = "";
           refreshParadeState(); // refresh parade state after submit
           refreshMissingAttendance(); // refresh missing attendance after submit
-        }, 1000);
+        });
+
+
+        // Placeholder: Simulate submission success
+        // setTimeout(() => {
+        //   document.getElementById('mainApp').classList.remove('loading');
+        //   alert("Submitted successfully ✓");
+        //   document.getElementById('dynamicForm').style.display = 'none';
+        //   document.getElementById('statusMsg').textContent = "";
+        //   refreshParadeState(); // refresh parade state after submit
+        //   refreshMissingAttendance(); // refresh missing attendance after submit
+        // }, 1000);
 
         // OLD CODE REPLACED:
         /*
@@ -815,8 +904,8 @@
         */
       }
 
-      function closeModal() {
-        document.getElementById('confirmModal').style.display = 'none';
+      function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
       }
 
       // --- Removed getDistance function ---
@@ -832,6 +921,104 @@
         return R * c;
       }
       */
+
+
+      // --- Firebase Authentication Functions ---
+      async function signInWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          await auth.signInWithPopup(provider);
+          // onAuthStateChanged will handle the rest
+        } catch (error) {
+          console.error("Google sign-in error:", error);
+          alert("Google sign-in failed: " + error.message);
+        }
+      }
+
+      function showEmailSignIn() {
+        document.getElementById('emailSignInModal').style.display = 'flex';
+      }
+
+      async function performEmailSignIn() {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+
+        if (!email || !password) {
+          alert("Please enter both email and password.");
+          return;
+        }
+
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          // onAuthStateChanged will handle the rest
+          closeModal('emailSignInModal');
+        } catch (error) {
+          console.error("Email sign-in error:", error);
+          alert("Email sign-in failed: " + error.message);
+        }
+      }
+
+      async function signInWithPhone() {
+        const phoneNumber = document.getElementById('phoneInput').value.trim();
+        if (!phoneNumber) {
+          alert("Please enter a phone number.");
+          return;
+        }
+
+        try {
+          // Render the reCAPTCHA widget
+          if (!recaptchaVerifier) {
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('phoneSignInModal', {
+              'size': 'invisible', // Or 'normal'
+              'callback': (response) => {
+                console.log("reCAPTCHA solved, allowing phone auth.");
+              },
+              'expired-callback': () => {
+                console.warn("reCAPTCHA expired.");
+                alert("reCAPTCHA expired. Please try again.");
+              }
+            });
+          }
+
+          // Send verification code
+          const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
+          window.confirmationResult = confirmationResult; // Store globally for verification step
+
+          // Show the verification code input section
+          document.getElementById('verificationCodeSection').style.display = 'block';
+          document.getElementById('phoneSignInModal').scrollIntoView({ behavior: 'smooth' }); // Scroll to input
+
+        } catch (error) {
+          console.error("Phone sign-in error:", error);
+          alert("Phone sign-in failed: " + error.message);
+        }
+      }
+
+      async function verifyPhoneCode() {
+        const code = document.getElementById('verificationCodeInput').value.trim();
+        if (!code) {
+          alert("Please enter the verification code.");
+          return;
+        }
+
+        try {
+          if (!window.confirmationResult) {
+            throw new Error("No verification code request pending.");
+          }
+          await window.confirmationResult.confirm(code);
+          // onAuthStateChanged will handle the rest
+          closeModal('phoneSignInModal');
+          // Clean up the confirmation result and recaptcha verifier after successful login
+          window.confirmationResult = null;
+          if (recaptchaVerifier) {
+             recaptchaVerifier.clear();
+             recaptchaVerifier = null;
+          }
+        } catch (error) {
+          console.error("Phone verification error:", error);
+          alert("Verification failed: " + error.message);
+        }
+      }
 
 
     </script>
