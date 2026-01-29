@@ -114,6 +114,505 @@
       background: var(--white); 
       color: var(--gray-900); 
       border: 1px solid var(--gray-200); 
+      display: flex; /* Align icon and text */
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-google img {
+        width: 20px; /* Size Google icon */
+        height: 20px;
+        margin-right: 8px; /* Space between icon and text */
+    }
+    
+    .btn-email { 
+      background: var(--gray-100); 
+      color: var(--gray-800); 
+    }
+    
+    .btn-admin { 
+      background: #4b5563; 
+      color: var(--white); 
+    }
+    
+    .btn-primary { 
+      background: var(--primary); 
+      color: var(--white); 
+    }
+    
+    .btn-success { 
+      background: var(--success); 
+      color: var(--white); 
+    }
+    
+    .btn-warning { 
+      background: var(--warning); 
+      color: var(--white); 
+    }
+    
+    .btn-danger { 
+      background: var(--danger); 
+      color: var(--white); 
+    }
+    
+    .btn-purple { 
+      background: var(--purple); 
+      color: var(--white); 
+    }
+    
+    .btn-gray { 
+      background: var(--gray-100); 
+      color: var(--gray-800); 
+    }
+
+    .form-group { 
+      margin-bottom: 16px; 
+    }
+    
+    label { 
+      display: block; 
+      margin-bottom: 6px; 
+      font-weight: 500; 
+      font-size: 0.95rem; 
+      color: var(--gray-800); 
+    }
+    
+    input, select { 
+      width: 100%; 
+      padding: 12px; 
+      border: 1px solid var(--gray-200); 
+      border-radius: 8px; /* Softer input corners */
+      font-size: 1rem; 
+      transition: var(--transition);
+      background-color: var(--gray-50); /* Lighter input background */
+    }
+    
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary-light); /* Highlight on focus */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Focus ring */
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--gray-200);
+      margin-bottom: 24px;
+      background-color: var(--gray-50); /* Subtle background for tab bar */
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      font-weight: 600;
+      color: var(--gray-600); /* Muted color for inactive tabs */
+      cursor: pointer;
+      text-align: center;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+    
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: var(--primary);
+        border-radius: 3px 3px 0 0;
+    }
+
+    .user-card {
+      background: linear-gradient(to bottom right, #dbeafe, #bfdbfe); /* Subtle gradient */
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 24px;
+      border: 1px solid #93c5fd; /* Matching border */
+      box-shadow: var(--shadow-sm); /* Subtle shadow */
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gray-900);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .toast.show { 
+      opacity: 1; 
+    }
+
+    .parade-output {
+      background: var(--gray-100); /* Lighter background */
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 0.9rem;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 16px;
+      border: 1px solid var(--gray-200); /* Subtle border */
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Inner shadow */
+    }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: #9ca3af; /* Muted divider color */
+      position: relative;
+      font-size: 0.9rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    .divider::before { 
+      left: 0; 
+    }
+    
+    .divider::after { 
+      right: 0; 
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+      <header><h1>56th Mech Attendance</h1></header>
+      <div style="padding: 24px;">
+        <h2 style="text-align:center; margin-bottom:24px;">Sign in to log your attendance</h2>
+        
+        <!-- Standard Email/Password Login -->
+        <div class="form-group">
+          <label for="emailInputLogin">Email</label>
+          <input type="email" id="emailInputLogin" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="passwordInputLogin">Password</label>
+          <input type="password" id="passwordInputLogin" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" id="btn-signin-email" onclick="handleEmailLoginFromLoginScreen()">Sign In</button>
+        
+        <!-- Divider -->
+        <div class="divider" style="margin: 24px 0;">or</div>
+        
+        <!-- Google Sign-In -->
+        <button class="btn btn-google" onclick="signInWithGoogle()">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FFC107' d='M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z'/%3E%3Cpath fill='%23FF3D00' d='M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z'/%3E%3Cpath fill='%234CAF50' d='M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z'/%3E%3Cpath fill='%231976D2' d='M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z'/%3E%3C/svg%3E" alt="Google Logo">
+            Sign in with Google
+        </button>
+        
+        <!-- Instructor Login Button -->
+        <button class="btn btn-admin" onclick="signInAsAdmin()" style="margin-top: 12px;">🛡️ Sign in as Instructor</button>
+      </div>
+    </div>
+
+    <!-- Email Login (if needed elsewhere) -->
+    <div id="emailLoginScreen" class="screen">
+      <header><h1>Email Login</h1></header>
+      <div style="padding: 24px;">
+        <div class="form-group">
+          <label for="emailInput">Email</label>
+          <input type="email" id="emailInput" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="passwordInput">Password</label>
+          <input type="password" id="passwordInput" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" onclick="handleEmailLogin()">Sign In</button>
+        <button class="btn btn-gray" onclick="goBackToLogin()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Registration (First Time) -->
+    <div id="registerScreen" class="screen">
+      <header><h1>Welcome!</h1></header>
+      <div style="padding: 24px;">
+        <p style="text-align:center; margin-bottom:24px;">Enter your rank and name</p>
+        <div class="form-group">
+          <label for="regName">Rank & Name (e.g. ME1T John)</label>
+          <input type="text" id="regName" placeholder="ME1T John" maxlength="50">
+        </div>
+        <button class="btn btn-primary" onclick="completeRegistration()">Complete Setup</button>
+      </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appScreen" class="screen">
+      <header>
+        <h1>56th Mech Attendance</h1>
+        <button class="logout-btn" onclick="signOut()">Logout</button>
+      </header>
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('attendance')">Attendance</button>
+        <button class="tab-btn" onclick="switchTab('parade')">Parade</button>
+        <button class="tab-btn" onclick="switchTab('missing')">Missing</button>
+      </div>
+
+      <!-- Attendance -->
+      <div id="attendanceTab" class="tab-content">
+        <div class="user-card">
+          Hello, <strong id="userNameDisplay"></strong><br>
+          <small id="userEmailDisplay"></small>
+        </div>
+        <div class="grid">
+          <button class="btn btn-success" onclick="submitStatus('Present')">✅ Present</button>
+          <button class="btn btn-warning" onclick="openForm('RSO')">RSO</button>
+          <button class="btn btn-danger" onclick="openForm('MC')">MC</button>
+          <button class="btn btn-purple" onclick="openForm('RSI')">RSI</button>
+          <button class="btn btn-gray" onclick="openForm('Late')">Late</button>
+          <button class="btn btn-primary" onclick="openForm('Leave')">Leave</button>
+          <!-- Added buttons for HL, OIL, OTH -->
+          <button class="btn btn-gray" onclick="openForm('HL')">HL</button>
+          <button class="btn btn-gray" onclick="openForm('OIL')">OIL</button>
+          <button class="btn btn-gray" onclick="openForm('OTH')">OTH</button>
+        </div>
+        <div id="dynamicForm" style="display:none; margin-top:20px;">
+          <h3 id="formTitle"></h3>
+          <div id="formFields"></div>
+          <button class="btn btn-primary" style="margin-top:12px;" onclick="reviewSubmission()">Review & Submit</button>
+          <button class="btn btn-gray" style="margin-top:8px;" onclick="cancelForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Parade -->
+      <div id="paradeTab" class="tab-content" style="display:none;">
+        <button class="btn btn-primary" onclick="generateParadeState()">
+          <span id="paradeBtnText">🔄 Generate Parade State</span>
+        </button>
+        <button class="btn btn-gray" style="margin-top:8px;" onclick="copyParadeState()">📋 Copy All</button>
+        <div class="parade-output" id="paradeOutput">Click "Generate"</div>
+      </div>
+
+      <!-- Missing -->
+      <div id="missingTab" class="tab-content" style="display:none;">
+        <button class="btn btn-primary" onclick="generateMissingList()">
+          <span id="missingBtnText">🔄 Generate Missing List</span>
+        </button>
+        <button class="btn btn-gray" style="margin-top:8px;" onclick="copyMissingList()">📋 Copy All</button>
+        <div class="parade-output" id="missingOutput">Click "Generate"</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // 🔐 REPLACE WITH YOUR FIREBASE CONFIG (DO NOT COMMIT TO GITHUB)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
+      authDomain: "attendance-idrus.firebaseapp.com",
+      projectId: "attendance-idrus",
+      storageBucket: "attendance-idrus.firebasestorage.app",
+      messagingSenderId: "561467450966",
+      appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
+      measurementId: "G-9TBLYGP4P5"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Admin credentials (for demo only — use custom claims in prod)
+    const ADMIN_EMAIL = "admin@unit.gov.sg";
+    const ADMIN_PASSWORD = "YourSecureAdminPass123!";
+
+    let currentUser = null;
+
+    // --- UI Helpers ---
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.backgroundColor = isError ? '#ef4444' : '#1e293b';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function switchTab(tab) {
+      ['attendance','parade','missing'].forEach(t => {
+        document.getElementById(`${t}Tab`).style.display = 'none';
+        document.querySelector(`[onclick="switchTab('${t}')"]`).classList.remove('active');
+      });
+      document.getElementById(`${tab}Tab`).style.display = 'block';
+      document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+      
+      // Auto-generate data when switching to parade/missing tabs
+      if (tab === 'parade') {
+        generateParadeState();
+      } else if (tab === 'missing') {
+        generateMissingList();
+      }
+    }
+
+    // --- Auth ---
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => handleAuthSuccess(result.user))
+        .catch(err => {
+          console.error("Google sign-in error:", err);
+          showToast("Google login failed: " + err.message, true);
+        });
+    }
+
+    function showEmailLogin() { 
+      showScreen('emailLoginScreen'); 
+    }
+    
+    function goBackToLogin() { 
+      showScreen('loginScreen'); 
+    }
+
+    function handleEmailLoginFromLoginScreen() {
+      // Get credentials from the login screen fields
+      const email = document.getElementById('emailInputLogin').value.trim();
+      const pwd = document.getElementById('passwordInputLogin').value;
+      
+      if (!email || !pwd) return showToast("Fill both fields", true);
+      
+      auth.signInWithEmailAndPassword(email, pwd)
+        .then(user => handleAuthSuccess(user.user))
+        .catch(err => {
+          if (err.code === "auth/user-not-found") {
+            const name = prompt("First time? Enter Rank + Name:");
+            if (name) registerNewUser(name, email, pwd);
+          } else {
+            showToast("Login failed: " + err.message, true);
+          }
+        });
+    }
+
+    function handleEmailLogin() {
+      const email = document.getElementById('emailInput').value.trim();
+      const pwd = document.getElementById('passwordInput').value;
+      if (!email || !pwd) return showToast("Fill both fields", true);
+      
+      auth.signInWithEmailAndPassword(email, pwd)
+        .then(user => handleAuthSuccess(user.user))
+        .catch(err => {
+          if (err.code === "auth/user-not-found") {
+            const name = prompt("First time? Enter Rank + Name:");
+            if (name) registerNewUser(name, email, pwd);
+          } else {
+            showToast("Login failed: " + err.message, true);
+          }
+        });
+    }
+
+    function signInAsAdmin() {
+      auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD)
+        .then(() => {
+          currentUser = { 
+            uid: auth.currentUser.uid, 
+            email: ADMIN_EMAIL, 
+            name: "Admin", 
+            role: "admin" 
+          };
+          initApp();
+        })
+        .catch(() => showToast("Admin login failed", true));
+    }
+
+    function handleAuthSuccess(user) {
+      db.collection("users").doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          currentUser = { 
+            uid: user.uid, 
+            email: user.email, 
+            name: data.name, 
+            role: "trainee" 
+          };
+          initApp();
+        } else {
+          currentUser = { uid: user.uid, email: user.email };
+          showScreen('registerScreen');
+        }
+      }).catch(err => {
+        console.error("Error fetching user ", err);
+        showToast("Failed to load user data", true);
+      });
+    }
+
+    function completeRegistration() {
+      const name = document.getElementById('regName').value.trim();
+      if (!name) return showToast("Enter rank + name", true);
+      
+      db.collection("users").doc(currentUser.uid).set({
+        name: name,
+        email: currentUser.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        cur    .btn:hover {
+      transform: translateY(-2px); /* Lift effect on hover */
+      box-shadow: var(--shadow-md); /* Enhanced shadow on hover */
+    }
+
+    .btn:active {
+      transform: translateY(0); /* Reset lift on click */
+    }
+
+    .btn-google { 
+      background: var(--white); 
+      color: var(--gray-900); 
+      border: 1px solid var(--gray-200); 
     }
     
     .btn-email { 
