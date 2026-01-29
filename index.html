@@ -447,70 +447,114 @@ function logAttendance(data) {
   const today = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
   const time = `${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
 
-  db.collection("attendance_logs").add({
-    uid: currentUser.uid,
-    name: currentUser.name,
-    email: currentUser.email,
-    status: data.status,
-    details: data.details,
-    info: data.info,
-    date: today,
-    time: time,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    showToast("✅ Submitted!");
-    generateParadeState();
-  }).catch(err => showToast("Submission failed: " + err.message, true));
+function logAttendance(data) {
+  // ... [your existing code] ...
+
+  db.collection("attendance_logs").add({ /* ... */ })
+    .then(() => {
+      showToast("✅ Submitted!");
+      // 👇 ADD THESE TWO LINES
+      generateParadeState();
+      generateMissingList(); // Refresh missing list too
+    })
+    .catch(err => showToast("Submission failed: " + err.message, true));
 }
 
 // --- Parade & Missing ---
 function generateParadeState() {
   const output = document.getElementById('paradeOutput');
   output.textContent = "Loading...";
-  const today = new Date();
-  const todayStr = `${today.getDate().toString().padStart(2,'0')}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getFullYear()}`;
-  const timeStr = `${today.getHours().toString().padStart(2,'0')}${today.getMinutes().toString().padStart(2,'0')}`;
+  
+  const now = new Date();
+  const todayStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+  const timeStr = `${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
 
-  db.collection("settings").doc("course").get().then(doc => {
-    const course = doc.exists ? doc.data().name || "56th Mechanical Course" : "56th Mechanical Course";
-    return db.collection("attendance_logs").where("date", "==", todayStr).get();
-  }).then(snapshot => {
-    const logs = [];
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      if (!logs.some(l => l.uid === d.uid)) logs.push(d);
+  // Step 1: Get course name
+  db.collection("settings").doc("course").get()
+    .then(courseDoc => {
+      const course = courseDoc.exists 
+        ? courseDoc.data().name || "56th Mechanical Course" 
+        : "56th Mechanical Course";
+
+      // Step 2: Get ALL registered users (for Total Strength)
+      return db.collection("users").get()
+        .then(userSnap => {
+          const totalStrength = userSnap.size;
+
+          // Step 3: Get TODAY'S attendance logs
+          return db.collection("attendance_logs")
+            .where("date", "==", todayStr)
+            .get()
+            .then(logSnap => {
+              // Deduplicate by UID (latest per user)
+              const logs = [];
+              logSnap.forEach(doc => {
+                const data = doc.data();
+                if (!logs.some(l => l.uid === data.uid)) {
+                  logs.push(data);
+                }
+              });
+
+              // Step 4: Count statuses
+              const counts = { 
+                MA: 0, RSI: 0, RSO: 0, 'MC(Ag-)': 0, 'MC(Ag+)': 0, 
+                HL: 0, OIL: 0, LEAVE: 0, OTH: 0, LATE: 0 
+              };
+              const details = { 
+                RSI: [], RSO: [], 'MC(Ag-)': [], LEAVE: [], LATE: [] 
+              };
+
+              logs.forEach(log => {
+                if (log.status === 'Present') {
+                  counts.MA++;
+                } else if (log.status === 'RSI') {
+                  counts.RSI++;
+                  details.RSI.push(`${log.name} (${log.details})`);
+                } else if (log.status === 'RSO') {
+                  counts.RSO++;
+                  details.RSO.push(`${log.name} (${log.details})`);
+                } else if (log.status === 'MC') {
+                  counts['MC(Ag-)']++;
+                  details['MC(Ag-)'].push(`${log.name} (${log.details})`);
+                } else if (log.status === 'Leave') {
+                  counts.LEAVE++;
+                  details.LEAVE.push(`${log.name} (${log.details})`);
+                } else if (log.status === 'Late') {
+                  counts.LATE++;
+                  details.LATE.push(`${log.name} (${log.details})`);
+                }
+              });
+
+              // Step 5: Generate parade state text
+              let text = `Parade state at ${timeStr} (${todayStr})
+Course: ${course}
+Total Strength: ${totalStrength}
+MA: ${counts.MA}
+RSI: ${counts.RSI}`;
+              
+              details.RSI.forEach(d => text += `\n${d}`);
+              text += `\nRSO: ${counts.RSO}`;
+              details.RSO.forEach(d => text += `\n${d}`);
+              text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
+              details['MC(Ag-)'].forEach(d => text += `\n${d}`);
+              text += `\nMC(Ag+): ${counts['MC(Ag+)']}
+HL: ${counts.HL}
+OIL: ${counts.OIL}
+LEAVE: ${counts.LEAVE}`;
+              details.LEAVE.forEach(d => text += `\n${d}`);
+              text += `\nOTH: ${counts.OTH}
+LATE: ${counts.LATE}`;
+              details.LATE.forEach(d => text += `\n${d}`);
+              text += `\nPresent Strength: ${counts.MA}`;
+
+              output.textContent = text;
+            });
+        });
+    })
+    .catch(err => {
+      console.error("Error generating parade state:", err);
+      output.textContent = "Error loading parade state.";
     });
-
-    const counts = { MA:0, RSI:0, RSO:0, 'MC(Ag-)':0, 'MC(Ag+)':0, HL:0, OIL:0, LEAVE:0, OTH:0, LATE:0 };
-    const details = { RSI:[], RSO:[], 'MC(Ag-)':[], LEAVE:[], LATE:[] };
-
-    logs.forEach(log => {
-      if (log.status === 'Present') counts.MA++;
-      else if (log.status === 'RSI') { counts.RSI++; details.RSI.push(`${log.name} (${log.details})`); }
-      else if (log.status === 'RSO') { counts.RSO++; details.RSO.push(`${log.name} (${log.details})`); }
-      else if (log.status === 'MC') { counts['MC(Ag-)']++; details['MC(Ag-)'].push(`${log.name} (${log.details})`); }
-      else if (log.status === 'Leave') { counts.LEAVE++; details.LEAVE.push(`${log.name} (${log.details})`); }
-      else if (log.status === 'Late') { counts.LATE++; details.LATE.push(`${log.name} (${log.details})`); }
-    });
-
-    const total = logs.length;
-    let text = `Parade state at ${timeStr} (${todayStr})\nCourse: ${course}\nTotal Strength: ${total}\nMA: ${counts.MA}\nRSI: ${counts.RSI}`;
-    details.RSI.forEach(d => text += `\n${d}`);
-    text += `\nRSO: ${counts.RSO}`;
-    details.RSO.forEach(d => text += `\n${d}`);
-    text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
-    details['MC(Ag-)'].forEach(d => text += `\n${d}`);
-    text += `\nMC(Ag+): ${counts['MC(Ag+)']}\nHL: ${counts.HL}\nOIL: ${counts.OIL}\nLEAVE: ${counts.LEAVE}`;
-    details.LEAVE.forEach(d => text += `\n${d}`);
-    text += `\nOTH: ${counts.OTH}\nLATE: ${counts.LATE}`;
-    details.LATE.forEach(d => text += `\n${d}`);
-    text += `\nPresent Strength: ${counts.MA}`;
-
-    output.textContent = text;
-  }).catch(err => {
-    output.textContent = "Error loading parade state.";
-    console.error(err);
-  });
 }
 
 function generateMissingList() {
