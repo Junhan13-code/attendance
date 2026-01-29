@@ -375,19 +375,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js  "></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js  "></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js  "></script>
-
+  
+  <!-- Load Firebase config -->
+  <script src="./firebase-config.js"></script>
+  
   <script>
-    // 🔐 REPLACE WITH YOUR FIREBASE CONFIG (DO NOT COMMIT TO GITHUB)
-    const firebaseConfig = {
-      apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
-      authDomain: "attendance-idrus.firebaseapp.com",
-      projectId: "attendance-idrus",
-      storageBucket: "attendance-idrus.firebasestorage.app",
-      messagingSenderId: "561467450966",
-      appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
-      measurementId: "G-9TBLYGP4P5"
-    };
-
+    // Initialize Firebase after config is loaded
+    const firebaseConfig = window.FIREBASE_CONFIG;
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -494,7 +488,7 @@
           showScreen('registerScreen');
         }
       }).catch(err => {
-        console.error("Error fetching user data:", err);
+        console.error("Error fetching user ", err);
         showToast("Failed to load user data", true);
       });
     }
