@@ -1,198 +1,246 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>56th Mechanical Attendance</title>
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- Firebase SDK Scripts (Corrected URLs without trailing spaces) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
   <style>
-    :root { --primary: #2563eb; --bg: #f8fafc; }
-    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin:0; padding:20px; display:flex; justify-content:center; min-height:100vh; }
-    .container { background:white; padding:24px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); width:100%; max-width:460px; }
-    .tab-nav { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:20px; }
-    .tab-button { flex:1; padding:12px; background:none; border:none; font-weight:600; color:#64748b; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.18s; }
-    .tab-button.active { color:var(--primary); border-bottom-color:var(--primary); }
-    .tab-button:hover:not(.active) { background:#f8fafc; }
-    .tab-content { display:none; }
-    .tab-content.active { display:block; }
-    h2 { margin:0 0 8px; text-align:center; color:#1e293b; }
-    .user-info-box { background:#e0f2fe; padding:16px; border-radius:8px; text-align:center; border:1px solid #bae6fd; margin-bottom:24px; }
-    .user-name { font-weight:600; font-size:1.1rem; }
-    .user-email { font-size:0.82rem; color:#0369a1; opacity:0.85; }
-    label { display:block; margin:16px 0 6px; font-weight:600; font-size:0.9rem; color:#475569; }
-    input, select { width:100%; padding:11px; border:1px solid #d1d5db; border-radius:6px; font-size:1rem; box-sizing:border-box; }
-    .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
-    button { padding:12px; border:none; border-radius:6px; color:white; font-weight:600; cursor:pointer; transition:all 0.15s; }
-    button:active { transform:scale(0.98); opacity:0.92; }
-    .btn-present { background:#059669; grid-column:span 2; }
-    .btn-rso     { background:#d97706; }
-    .btn-mc      { background:#dc2626; }
-    .btn-rsi     { background:#7c3aed; }
-    .btn-late    { background:#4b5563; }
-    .btn-leave   { background:var(--primary); grid-column:span 2; }
-    .btn-register,.btn-confirm { background:var(--primary); margin-top:12px; }
-    .btn-cancel   { background:#ef4444; margin-top:12px; }
-    #dynamicForm { border-top:1px solid #e2e8f0; margin-top:20px; padding-top:12px; display:none; }
-    #statusMsg { text-align:center; margin-top:16px; font-weight:600; min-height:1.4em; color:#059669; }
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000; }
-    .modal-content { background:white; padding:24px; border-radius:12px; width:90%; max-width:360px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.25); }
-    .summary-box { background:#f1f5f9; padding:12px; border-radius:8px; margin:16px 0; text-align:left; font-size:0.92rem; }
-    .summary-item { margin:6px 0; }
-    .summary-label { font-weight:600; color:#475569; }
-    .parade-item { padding:8px 12px; background:#f8fafc; border-radius:6px; margin-bottom:8px; border-left:3px solid var(--primary); }
-    .copy-button { background:var(--primary); color:white; padding:10px 16px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:12px; }
-    .hidden { display:none !important; }
-    .loading { opacity:0.4; pointer-events:none; }
-    .center-box { text-align:center; padding:60px 20px 40px; }
-    .big-icon { font-size:3.2rem; margin-bottom:16px; }
-
-    .missing-item {
-      padding:8px 12px;
-      background:#fffbeb;
-      border-radius:6px;
-      margin-bottom:8px;
-      border-left:3px solid #f59e0b;
+    :root {
+      --primary: #2563eb;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --purple: #7c3aed;
+      --gray: #f8fafc;
+      --light: #ffffff;
+      --border: #e2e8f0;
     }
-
-    /* New styles for parade state editing */
-    .parade-edit-section {
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--gray);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: var(--light);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 460px;
+    }
+    .tab-nav {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      font-weight: 600;
+      color: #64748b;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .tab-button.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .tab-button:hover:not(.active) {
+      background: var(--gray);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    h2 {
+      margin: 0 0 8px;
+      text-align: center;
+      color: #1e293b;
+    }
+    .user-info-box {
+      background: #e0f2fe;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #bae6fd;
+      margin-bottom: 24px;
+    }
+    .user-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .user-email {
+      font-size: 0.82rem;
+      color: #0369a1;
+      opacity: 0.85;
+    }
+    label {
+      display: block;
+      margin: 16px 0 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:active {
+      transform: scale(0.98);
+      opacity: 0.92;
+    }
+    .btn-present { background: var(--success); grid-column: span 2; }
+    .btn-rso     { background: var(--warning); }
+    .btn-mc      { background: var(--danger); }
+    .btn-rsi     { background: var(--purple); }
+    .btn-late    { background: #4b5563; }
+    .btn-leave   { background: var(--primary); grid-column: span 2; }
+    .btn-register, .btn-confirm {
+      background: var(--primary);
+      margin-top: 12px;
+    }
+    .btn-cancel {
+      background: #ef4444;
+      margin-top: 12px;
+    }
+    #dynamicForm {
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+      padding-top: 12px;
+      display: none;
+    }
+    #statusMsg {
+      text-align: center;
+      margin-top: 16px;
+      font-weight: 600;
+      min-height: 1.4em;
+      color: var(--success);
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .summary-box {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+    .summary-item {
+      margin: 6px 0;
+    }
+    .summary-label {
+      font-weight: 600;
+      color: #475569;
+    }
+    .parade-item {
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--primary);
+    }
+    .copy-button {
+      background: var(--primary);
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .loading {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .center-box {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+    .big-icon {
+      font-size: 3.2rem;
+      margin-bottom: 16px;
+    }
+    .missing-item {
+      padding: 8px 12px;
+      background: #fffbeb;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 3px solid #f59e0b;
+    }
+    /* Parade & Missing sections */
+    .parade-edit-section, .missing-edit-section {
       margin-top: 15px;
       padding: 15px;
       background-color: #f9f9f9;
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
     }
-
-    .parade-edit-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .parade-edit-input {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-
-    .parade-edit-label {
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #475569;
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .update-parade-btn {
-      background-color: #10b981;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight:600;
-      cursor: pointer;
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    .update-parade-btn:hover {
-      background-color: #059669;
-    }
-
-    .formatted-parade-state {
-      background-color: #f8fafc;
-      padding: 15px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      font-family: monospace;
-      font-size: 13px;
-      line-height: 1.4;
-      white-space: pre-line;
-      margin-top: 15px;
-      min-height: 300px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .parade-refresh-section {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .parade-refresh-btn {
-      background-color: #3b82f6;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight:600;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    .parade-refresh-btn:hover {
-      background-color: #2563eb;
-    }
-
     .generate-btn {
       background-color: #f59e0b;
       color: white;
       padding: 10px;
       border: none;
       border-radius: 6px;
-      font-weight:600;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
       width: 100%;
     }
-
-    .generate-btn:hover {
-      background-color: #d97706;
-    }
-    /* Add these CSS rules to the existing style section */
-    .missing-edit-section {
-      margin-top: 15px;
-      padding: 15px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .missing-refresh-section {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .missing-refresh-btn {
-      background-color: #3b82f6;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight:600;
-      cursor: pointer;
-      flex: 1;
-    }
-
-    .missing-refresh-btn:hover {
-      background-color: #2563eb;
-    }
-
-    .formatted-missing-attendance {
+    .generate-btn:hover { background-color: #d97706; }
+    .formatted-parade-state {
       background-color: #f8fafc;
       padding: 15px;
       border-radius: 6px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       font-family: monospace;
       font-size: 13px;
       line-height: 1.4;
@@ -202,825 +250,582 @@
       max-height: 400px;
       overflow-y: auto;
     }
-
-    /* Style for login buttons */
-    .login-buttons-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .login-form {
       margin-top: 20px;
     }
-    .login-btn {
-      background: var(--primary);
-      border: none;
-      color: white;
-      padding: 12px;
+    .login-option {
+      display: block;
+      margin: 8px 0;
+      padding: 10px;
+      background: #f1f5f9;
       border-radius: 6px;
-      font-weight: 600;
+      text-align: center;
       cursor: pointer;
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      transition: all 0.2s;
     }
-    .login-btn:hover {
-      opacity: 0.9;
+    .login-option:hover {
+      background: #e0f2fe;
     }
-    .login-btn.google { background: #4285F4; }
-    .login-btn.phone { background: #34A853; }
-    .login-btn.email { background: #EA4335; }
-
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      display: inline-block;
+      width: 40%;
+      height: 1px;
+      background: #e2e8f0;
+      vertical-align: middle;
+      margin: 0 8px;
+    }
   </style>
 </head>
 <body>
-  <!-- Removed the old role selection modal -->
-  <!-- <div id="roleSelectionModal" class="modal-overlay" style="display: flex;">
+
+<!-- Role Selection / Login Modal -->
+<div id="authModal" class="modal-overlay" style="display:flex;">
+  <div class="modal-content">
+    <h3>Welcome to 56th Mech Attendance</h3>
+    <p>Select login method:</p>
+
+    <div class="login-option" onclick="signInWithGoogle()">🔐 Sign in with Google</div>
+    <div class="login-option" onclick="signInWithEmail()">📧 Sign in with Email</div>
+    <div class="login-option" onclick="signInAsAdmin()">🛡️ Admin Login</div>
+
+    <div class="divider">or</div>
+    <button class="btn-register" onclick="showRegistration()">📝 Register as Trainee</button>
+  </div>
+</div>
+
+<!-- Main App -->
+<div class="container" id="mainApp" style="display:none;">
+  <h2>56th Mechanical Attendance</h2>
+  <p style="text-align:center; font-size:0.85rem; color:#64748b; margin:0 0 20px;">Made by 56th Mech Tribe 5</p>
+
+  <div class="tab-nav">
+    <button class="tab-button active" onclick="switchTab('attendance')">Attendance</button>
+    <button class="tab-button" onclick="switchTab('parade')">Parade State</button>
+    <button class="tab-button" onclick="switchTab('missing')">Missing Attendance</button>
+  </div>
+
+  <!-- Attendance Tab -->
+  <div id="attendance-tab" class="tab-content active">
+    <div id="loadingState" style="padding:40px 0; text-align:center;">Authenticating...</div>
+
+    <div id="registerState" class="hidden center-box">
+      <div class="big-icon">👋</div>
+      <h3>Welcome!</h3>
+      <p>Please enter your <strong>Rank & Name</strong></p>
+      <input type="text" id="regNameInput" placeholder="e.g. ME1T Jun Han" autocomplete="off">
+      <button class="btn-register" onclick="handleRegister()">Complete Registration</button>
+    </div>
+
+    <div id="appContent" class="hidden">
+      <div class="user-info-box">
+        Hello, <span class="user-name" id="displayUserName"></span>
+        <div class="user-email" id="displayUserEmail"></div>
+      </div>
+
+      <div class="grid">
+        <button class="btn-present" onclick="submitStatus('Present')">📍 Present</button>
+        <button class="btn-rso" onclick="showForm('RSO')">RSO</button>
+        <button class="btn-mc" onclick="showForm('MC')">MC</button>
+        <button class="btn-rsi" onclick="showForm('RSI')">RSI</button>
+        <button class="btn-late" onclick="showForm('Late')">Late</button>
+        <button class="btn-leave" onclick="showForm('Leave')">Leave</button>
+      </div>
+
+      <div id="dynamicForm">
+        <h3 id="formTitle">Details</h3>
+        <div id="formInputs"></div>
+        <button style="background:#1e293b; width:100%; margin-top:12px;" onclick="validateAndStage()">Review & Submit</button>
+      </div>
+    </div>
+
+    <div id="statusMsg"></div>
+  </div>
+
+  <!-- Parade State Tab -->
+  <div id="parade-tab" class="tab-content">
+    <div class="parade-state-container">
+      <h3>Current Parade State</h3>
+      <div class="parade-edit-section">
+        <h4>Generate Parade State</h4>
+        <button class="generate-btn" onclick="generateParadeState()">Generate Parade State</button>
+        <div style="margin-top:10px;">
+          <button class="copy-button" onclick="copyFormattedParadeState()">📋 Copy All</button>
+        </div>
+      </div>
+      <div id="formattedParadeState" class="formatted-parade-state">Click Generate to create parade state</div>
+      <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
+        Source: Firestore • `attendance_logs`
+      </p>
+    </div>
+  </div>
+
+  <!-- Missing Attendance Tab -->
+  <div id="missing-tab" class="tab-content">
+    <div class="missing-attendance-container">
+      <h3>Current Missing Attendance</h3>
+      <div class="missing-edit-section">
+        <h4>Generate Missing Attendance</h4>
+        <button class="generate-btn" onclick="generateMissingAttendance()">Generate Missing Attendance</button>
+        <div style="margin-top:10px;">
+          <button class="copy-button" onclick="copyMissingList()">📋 Copy All</button>
+        </div>
+      </div>
+      <div id="formattedMissingAttendance" class="formatted-parade-state">Click Generate to create missing list</div>
+      <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
+        Users who haven’t submitted today
+      </p>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="modal-overlay">
     <div class="modal-content">
-      <h3>Select Your Role</h3>
-      <button class="btn-trainee" onclick="selectRole('trainee')" style="background:#2563eb; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Trainee</button>
-      <button class="btn-instructor" onclick="selectRole('instructor')" style="background:#dc2626; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Instructor</button>
+      <h3>Confirm Submission</h3>
+      <div class="summary-box" id="summaryContent"></div>
+      <button class="btn-confirm" onclick="finalSubmit()">Yes, Submit</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
     </div>
-  </div> -->
+  </div>
+</div>
 
-  <div class="container" id="mainApp" style="display:none;">
-    <h2>Firebase Attendance App</h2> <!-- Placeholder Title -->
-    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin:0 0 20px;">Made by 56th Mech Tribe 5</p>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Login Screen -->
-    <div id="loginScreen" class="center-box">
-      <div class="big-icon">🔐</div>
-      <h3>Sign In</h3>
-      <p>Please choose a login method.</p>
-      <div class="login-buttons-container">
-        <button class="login-btn google" onclick="signInWithGoogle()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
-          Sign in with Google
-        </button>
-        <button class="login-btn phone" onclick="signInWithPhone()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 4h10v16H7V4zm2 14h6v-1H9v1zm0-3h6v-1H9v1zm0-3h6V9H9v3z"/></svg>
-          Sign in with Phone
-        </button>
-        <button class="login-btn email" onclick="showEmailSignIn()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-          Sign in with Email
-        </button>
-      </div>
-    </div>
+<script>
+// 🔐 Firebase Config — DO NOT COMMIT THIS TO GITHUB!
+// Instead, store in firebase-config.js and gitignore it.
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
 
-    <!-- Email Sign-In Modal -->
-    <div id="emailSignInModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>Sign in with Email</h3>
-        <input type="email" id="emailInput" placeholder="Enter your email" style="margin-bottom: 10px; width: 100%;">
-        <input type="password" id="passwordInput" placeholder="Enter your password" style="margin-bottom: 10px; width: 100%;">
-        <button class="btn-confirm" onclick="performEmailSignIn()">Sign In</button>
-        <button class="btn-cancel" onclick="closeModal('emailSignInModal')">Cancel</button>
-      </div>
-    </div>
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    <!-- Phone Sign-In Modal -->
-    <div id="phoneSignInModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>Sign in with Phone</h3>
-        <input type="tel" id="phoneInput" placeholder="+1234567890" style="margin-bottom: 10px; width: 100%;">
-        <button class="btn-confirm" onclick="sendPhoneVerification()">Send Verification Code</button>
-        <div id="verificationCodeSection" style="display: none;">
-          <input type="text" id="verificationCodeInput" placeholder="Enter verification code" style="margin-top: 10px; width: 100%;">
-          <button class="btn-confirm" onclick="verifyPhoneCode()">Verify Code</button>
-        </div>
-        <button class="btn-cancel" onclick="closeModal('phoneSignInModal')">Cancel</button>
-      </div>
-    </div>
+// Admin credentials (hardcoded for demo — replace with custom claims in prod)
+const ADMIN_EMAIL = "admin@unit.gov.sg";
+const ADMIN_PASSWORD = "YourSecureAdminPass123!";
 
-    <!-- Attendance Tab (initially hidden until logged in) -->
-    <div id="attendance-tab" class="tab-content">
-      <div id="loadingState" style="padding:40px 0; text-align:center;">Verifying identity...</div>
-      <div id="registerState" class="hidden center-box">
-        <div class="big-icon">👋</div>
-        <h3>Welcome!</h3>
-        <p>Please enter your <strong>Rank & Name</strong><br>to complete setup.</p>
-        <input type="text" id="regNameInput" placeholder="e.g. ME1T Jun Han" autocomplete="off">
-        <button class="btn-register" onclick="handleRegister()">Complete Setup</button>
-      </div>
-      <div id="appContent" class="hidden">
-        <div class="user-info-box">
-          Hello, <span class="user-name" id="displayUserName"></span>
-          <div class="user-email" id="displayUserEmail"></div>
-        </div>
-        <div class="grid">
-          <!-- Updated button text and onclick handler -->
-          <button class="btn-present" onclick="handlePresentSimple()">📍 Present</button>
-          <button class="btn-rso" onclick="showForm('RSO')">RSO</button>
-          <button class="btn-mc" onclick="showForm('MC')">MC</button>
-          <button class="btn-rsi" onclick="showForm('RSI')">RSI</button>
-          <button class="btn-late" onclick="showForm('Late')">Late</button>
-          <button class="btn-leave" onclick="showForm('Leave')">Leave</button>
-        </div>
-        <div id="dynamicForm">
-          <h3 id="formTitle">Details</h3>
-          <div id="formInputs"></div>
-          <button style="background:#1e293b; width:100%; margin-top:12px;" onclick="validateAndStage()">Review & Submit</button>
-        </div>
-      </div>
-      <div id="statusMsg"></div>
-    </div>
+let currentUser = { uid: "", email: "", name: "", role: "trainee" };
+let currentStatus = "";
+let cachedParadeData = null;
+let cachedMissingData = null;
 
-    <!-- Missing Attendance Tab (initially hidden until logged in) -->
-    <div id="missing-tab" class="tab-content">
-      <div class="missing-attendance-container">
-        <h3 style="margin:0 0 12px;">Current Missing Attendance</h3>
-        <div class="missing-edit-section">
-          <h4 style="margin:0 0 10px; color:#475569;">Generate Missing Attendance</h4>
-          <button class="generate-btn" onclick="generateMissingAttendance()">Generate Missing Attendance</button>
-          <div class="missing-refresh-section">
-            <button class="copy-button" onclick="copyMissingList()">📋 Copy All</button>
-          </div>
-        </div>
-        <div id="formattedMissingAttendance" class="formatted-parade-state">Click Generate to create missing attendance</div>
-        <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
-          Source: Firebase Data
-        </p>
-      </div>
-    </div>
+// --- AUTH FLOW ---
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(result => {
+    handleAuthSuccess(result.user);
+  }).catch(err => alert("Login failed: " + err.message));
+}
 
-    <!-- Parade State Tab (initially hidden until logged in) -->
-    <div id="parade-tab" class="tab-content">
-      <div class="parade-state-container">
-        <h3 style="margin:0 0 12px;">Current Parade State</h3>
-        <div class="parade-edit-section">
-          <h4 style="margin:0 0 10px; color:#475569;">Generate Parade State</h4>
-          <button class="generate-btn" onclick="generateParadeState()">Generate Parade State</button>
-          <div class="parade-refresh-section">
-            <button class="copy-button" onclick="copyFormattedParadeState()">📋 Copy All</button>
-          </div>
-        </div>
-        <div id="formattedParadeState" class="formatted-parade-state">Click Generate to create parade state</div>
-        <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
-          Source: Firebase Data
-        </p>
-      </div>
-    </div>
+function signInWithEmail() {
+  const email = prompt("Enter your email:");
+  const password = prompt("Enter your password:");
+  if (!email || !password) return;
+  auth.signInWithEmailAndPassword(email, password)
+    .then(user => handleAuthSuccess(user))
+    .catch(err => {
+      if (err.code === "auth/user-not-found") {
+        // Auto-register if not found
+        const name = prompt("First time? Enter Rank + Name (e.g. ME1T John):");
+        if (name) registerUser(name, email);
+      } else {
+        alert("Login failed: " + err.message);
+      }
+    });
+}
 
-    <div id="confirmModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3>Confirm Submission</h3>
-        <div class="summary-box" id="summaryContent"></div>
-        <button class="btn-confirm" onclick="finalSubmit()">Yes, Submit</button>
-        <button class="btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
-      </div>
-    </div>
+function signInAsAdmin() {
+  auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD)
+    .then(user => {
+      currentUser = { uid: user.uid, email: user.email, name: "Admin", role: "admin" };
+      initApp();
+    })
+    .catch(() => alert("Admin login failed. Check credentials."));
+}
 
-    <script>
-      // Add your Firebase configuration HERE
-      const firebaseConfig = {
-        apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
-        authDomain: "attendance-idrus.firebaseapp.com",
-        projectId: "attendance-idrus",
-        storageBucket: "attendance-idrus.firebasestorage.app",
-        messagingSenderId: "561467450966",
-        appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
-        measurementId: "G-9TBLYGP4P5"
+function showRegistration() {
+  const name = prompt("Enter Rank + Name (e.g. ME1T John):");
+  if (name) {
+    const email = prompt("Enter your email (must match auth):");
+    if (email) registerUser(name, email);
+  }
+}
+
+function registerUser(name, email) {
+  auth.createUserWithEmailAndPassword(email, "temp123!") // temp pwd
+    .then(user => {
+      db.collection("users").doc(user.uid).set({
+        name: name.trim(),
+        email: email.trim(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        currentUser = { uid: user.uid, email: email, name: name.trim(), role: "trainee" };
+        initApp();
+      });
+    })
+    .catch(err => alert("Registration failed: " + err.message));
+}
+
+function handleAuthSuccess(user) {
+  db.collection("users").doc(user.uid).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      currentUser = {
+        uid: user.uid,
+        email: user.email,
+        name: data.name || user.displayName || "Unknown",
+        role: data.role || "trainee"
+      };
+      initApp();
+    } else {
+      // First-time user
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('registerState').classList.remove('hidden');
+      document.getElementById('regEmail').textContent = user.email;
+      currentUser.uid = user.uid;
+      currentUser.email = user.email;
+    }
+  });
+}
+
+function initApp() {
+  document.getElementById('loadingState').classList.add('hidden');
+  if (currentUser.role === "admin") {
+    document.getElementById('appContent').classList.add('hidden');
+    document.getElementById('registerState').classList.add('hidden');
+    document.getElementById('displayUserName').textContent = "Admin";
+    document.getElementById('displayUserEmail').textContent = currentUser.email;
+  } else {
+    document.getElementById('appContent').classList.remove('hidden');
+    document.getElementById('registerState').classList.add('hidden');
+    document.getElementById('displayUserName').textContent = currentUser.name;
+    document.getElementById('displayUserEmail').textContent = currentUser.email;
+  }
+  refreshParadeState();
+}
+
+// --- TAB SWITCHING ---
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
+  document.getElementById(`${tab}-tab`).classList.add('active');
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+
+  if (tab === 'parade') generateParadeState();
+  if (tab === 'missing') generateMissingAttendance();
+}
+
+// --- FORM HANDLING ---
+function showForm(type) {
+  currentStatus = type;
+  const container = document.getElementById('formInputs');
+  document.getElementById('dynamicForm').style.display = 'block';
+  document.getElementById('formTitle').textContent = `${type} Details`;
+  container.innerHTML = "";
+
+  if (type === 'RSO') {
+    container.innerHTML = `
+      <label>Symptoms</label>
+      <input id="d1" placeholder="Symptoms" required>
+      <label>Location</label>
+      <input id="d2" placeholder="e.g. Choa Chu Kang Polyclinic" required>`;
+  } else if (type === 'MC') {
+    const today = new Date().toISOString().split('T')[0];
+    container.innerHTML = `
+      <label>Start Date (dd/mm/yyyy)</label>
+      <input type="date" id="d1" min="${today}" required>
+      <label>End Date (dd/mm/yyyy)</label>
+      <input type="date" id="d2" min="${today}" required>`;
+    setTimeout(() => {
+      const d1 = document.getElementById('d1');
+      const d2 = document.getElementById('d2');
+      if (d1 && d2) {
+        d1.addEventListener('change', () => {
+          d2.min = d1.value || today;
+          if (d2.value && d2.value < d1.value) d2.value = d1.value;
+        });
+        d2.addEventListener('change', () => {
+          if (d1.value && d2.value && d2.value < d1.value) d2.value = d1.value;
+        });
+      }
+    }, 0);
+  } else if (type === 'RSI') {
+    container.innerHTML = `<input id="d1" placeholder="Symptoms" required>`;
+  } else if (type === 'Late') {
+    container.innerHTML = `
+      <label>Reason</label>
+      <input id="d1" placeholder="Reason" required>
+      <label>Estimated Arrival</label>
+      <input type="time" id="d2" required>`;
+  } else if (type === 'Leave') {
+    container.innerHTML = `
+      <select id="d1" required>
+        <option value="">-- Select --</option>
+        <option>Full-Day</option>
+        <option>Half-Day (AM)</option>
+        <option>Half-Day (PM)</option>
+      </select>`;
+  }
+}
+
+function validateAndStage() {
+  const d1 = document.getElementById('d1');
+  const d2 = document.getElementById('d2');
+  if (d1 && !d1.value.trim()) { alert("Please fill in required field"); d1.focus(); return; }
+  if (d2 && !d2.value.trim()) { alert("Please fill in required field"); d2.focus(); return; }
+
+  let details = d1 ? d1.value.trim() : "";
+  let locationOrTime = d2 ? d2.value.trim() : "N/A";
+
+  // Format MC dates if needed
+  if (currentStatus === 'MC' && d1.type === 'date') {
+    const [y1, m1, d1v] = d1.value.split('-');
+    const [y2, m2, d2v] = d2.value.split('-');
+    details = `${d1v}${m1}${y1.slice(2)}-${d2v}${m2}${y2.slice(2)}`;
+    locationOrTime = "N/A"; // override
+  }
+
+  openConfirmation({
+    name: currentUser.name,
+    status: currentStatus,
+    details,
+    locationOrTime,
+    uid: currentUser.uid,
+    email: currentUser.email
+  });
+}
+
+function openConfirmation(data) {
+  const modal = document.getElementById('confirmModal');
+  modal.dataset.payload = JSON.stringify(data);
+  document.getElementById('summaryContent').innerHTML = `
+    <div class="summary-item"><span class="summary-label">Name:</span> ${data.name}</div>
+    <div class="summary-item"><span class="summary-label">Status:</span> ${data.status}</div>
+    <div class="summary-item"><span class="summary-label">Details:</span> ${data.details || '-'}</div>
+    <div class="summary-item"><span class="summary-label">Info:</span> ${data.locationOrTime}</div>
+  `;
+  modal.style.display = 'flex';
+}
+
+function finalSubmit() {
+  const modal = document.getElementById('confirmModal');
+  const payload = JSON.parse(modal.dataset.payload);
+  closeModal();
+
+  const now = new Date();
+  const todayStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+  const timeStr = `${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+
+  const logData = {
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    date: todayStr,
+    time: timeStr,
+    name: payload.name,
+    status: payload.status,
+    details: payload.details,
+    info: payload.locationOrTime,
+    uid: payload.uid,
+    email: payload.email
+  };
+
+  db.collection("attendance_logs").add(logData)
+    .then(() => {
+      alert("Submitted successfully ✓");
+      document.getElementById('dynamicForm').style.display = 'none';
+      refreshParadeState();
+      generateMissingAttendance();
+    })
+    .catch(err => alert("Submission failed: " + err.message));
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').style.display = 'none';
+}
+
+// --- PARADE STATE LOGIC ---
+function generateParadeState() {
+  const btn = document.querySelector('.generate-btn');
+  const originalText = btn.textContent;
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+
+  const today = new Date();
+  const todayStr = `${today.getDate().toString().padStart(2,'0')}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getFullYear()}`;
+  const timeStr = `${today.getHours().toString().padStart(2,'0')}${today.getMinutes().toString().padStart(2,'0')}`;
+
+  db.collection("settings").doc("course").get()
+    .then(doc => {
+      const course = doc.exists ? doc.data().name || "56th Mechanical Course" : "56th Mechanical Course";
+
+      // Get latest submission per user (today only)
+      return db.collection("attendance_logs")
+        .where("date", "==", todayStr)
+        .orderBy("timestamp", "desc")
+        .get();
+    })
+    .then(snapshot => {
+      const logs = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        // Only keep latest per user
+        if (!logs.some(l => l.uid === data.uid)) logs.push(data);
+      });
+
+      // Count categories
+      const counts = {
+        MA: 0, RSI: 0, RSO: 0, 'MC(Ag-)': 0, 'MC(Ag+)': 0,
+        HL: 0, OIL: 0, LEAVE: 0, OTH: 0, LATE: 0
+      };
+      const details = {
+        'RSI': [], 'RSO': [], 'MC(Ag-)': [], 'LEAVE': [], 'LATE': []
       };
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore(); // Initialize Firestore
-
-      // --- Removed geolocation constants ---
-      // const AFTC_LAT  = 1.3500;
-      // const AFTC_LNG  = 103.8991;
-      // const RADIUS_M  = 250;
-
-      let currentUser = { name:"", email:"", uid: "", role: "trainee" }; // Added uid and role
-      let currentStatus = "";
-      let cachedParadeData = null;
-      let cachedMissingData = null;
-      let confirmationPayload = {}; // Store payload for confirmation
-      let recaptchaVerifier = null; // Store Recaptcha verifier instance for phone auth
-
-      // --- Removed old handlePresent function ---
-      /*
-      function handlePresent() {
-        document.getElementById('statusMsg').textContent = "Getting location...";
-
-        if (!navigator.geolocation) return alert("Location services not supported");
-
-        navigator.geolocation.getCurrentPosition(pos => {
-          const dist = getDistance(pos.coords.latitude, pos.coords.longitude, AFTC_LAT, AFTC_LNG);
-          const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
-
-          if (dist <= RADIUS_M) {
-            openConfirmation({
-              name: currentUser.name,
-              status: "Present",
-              details: "At AFTC",
-              locationOrTime: "N/A",
-              coords
-            });
-          } else {
-            alert(`You are ~${Math.round(dist)} m away from AFTC.\nPlease move closer.`);
-          }
-          document.getElementById('statusMsg').textContent = "";
-        }, () => {
-          alert("Location access denied.\nPlease enable GPS / location permission.");
-          document.getElementById('statusMsg').textContent = "";
-        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
-      }
-      */
-
-      // --- NEW Simplified handlePresent function ---
-      function handlePresentSimple() {
-        // Assuming user identity (name, email, uid) is already established via Firebase Auth
-        // No location check needed anymore
-        openConfirmation({
-          name: currentUser.name,
-          status: "Present",
-          details: "Attendance taken",
-          locationOrTime: "N/A" // Or maybe current time?
-        });
-      }
-
-      // --- Placeholder Functions for Firebase Integration ---
-      // You will replace these with actual Firebase SDK calls
-
-      async function initializeAppWithAuth() {
-        // This function should be called after Firebase SDK is loaded and initialized
-        // It handles the auth state listener
-        auth.onAuthStateChanged(async (user) => {
-          if (user) {
-            // User is signed in
-            console.log("User logged in:", user.uid, user.email);
-            // Fetch user details (name, role) from Firestore using user.uid
-            await fetchUserDataFromFirestore(user.uid, user.email);
-          } else {
-            // User is signed out
-            console.log("No user logged in");
-            // Show login screen
-            showLoginScreen();
-          }
-        });
-      }
-
-      function showLoginScreen() {
-        document.getElementById('loadingState').textContent = "Please log in.";
-        document.getElementById('attendance-tab').classList.remove('active');
-        document.getElementById('parade-tab').classList.remove('active');
-        document.getElementById('missing-tab').classList.remove('active');
-        document.getElementById('loginScreen').style.display = 'block'; // Show login screen
-        document.getElementById('mainApp').style.display = 'block'; // Ensure main app is shown
-      }
-
-      async function fetchUserDataFromFirestore(uid, email) {
-        try {
-          const userDocRef = db.collection("users").doc(uid);
-          const docSnap = await userDocRef.get();
-
-          if (docSnap.exists) {
-            const userData = docSnap.data();
-            currentUser.name = userData.name || "Unknown User";
-            currentUser.role = userData.role || "trainee";
-            currentUser.email = email; // From auth
-            currentUser.uid = uid;     // From auth
-            initApp(currentUser); // Continue app initialization
-          } else {
-            // User not found in Firestore, needs registration step
-            currentUser.email = email;
-            currentUser.uid = uid;
-            showRegistrationPrompt();
-          }
-        } catch (error) {
-          console.error("Error fetching user data from Firestore:", error);
-          alert("Error loading user data. Please try again later.");
-          // Optionally, sign the user out if the error is critical
-          // await auth.signOut();
+      logs.forEach(log => {
+        const { status, name, details: det } = log;
+        if (status === 'Present') counts['MA']++;
+        else if (status === 'RSI') {
+          counts['RSI']++;
+          details['RSI'].push(`${name} (${det})`);
+        } else if (status === 'RSO') {
+          counts['RSO']++;
+          details['RSO'].push(`${name} (${det})`);
+        } else if (status === 'MC') {
+          // Assume Ag- unless marked Ag+
+          const cat = det.includes('+') ? 'MC(Ag+)' : 'MC(Ag-)';
+          counts[cat]++;
+          details[cat].push(`${name} (${det})`);
+        } else if (status === 'Late') {
+          counts['LATE']++;
+          details['LATE'].push(`${name} (${det})`);
+        } else if (status === 'Leave') {
+          counts['LEAVE']++;
+          details['LEAVE'].push(`${name} (${det})`);
         }
-      }
+      });
 
-      function showRegistrationPrompt() {
-         document.getElementById('loadingState').classList.add('hidden');
-         document.getElementById('registerState').classList.remove('hidden');
-         document.getElementById('regEmail').textContent = currentUser.email;
-      }
+      const totalStrength = logs.length; // or fetch from settings/users count
+      const presentCount = counts['MA'];
 
-      // --- Modified initApp to accept user object ---
-      function initApp(identity) {
-        // If user is an unauthorized instructor, show an error and hide the main app
-        // TODO: Check role against instructor email fetched from Firestore settings
-        if (identity.role === "unauthorized_instructor") {
-          alert("You are not authorized as an instructor. Access denied.");
-          document.getElementById('mainApp').style.display = 'none';
-          showLoginScreen(); // Show login screen again or handle as needed
-          return;
-        }
+      let parade = `Parade state at ${timeStr} (${todayStr})\nCourse: ${course}\nTotal Strength: ${totalStrength}\n`;
+      parade += `MA: ${counts['MA']}\nRSI: ${counts['RSI']}`;
+      if (details['RSI'].length) details['RSI'].forEach(d => parade += `\n${d}`);
+      parade += `\nRSO: ${counts['RSO']}`;
+      if (details['RSO'].length) details['RSO'].forEach(d => parade += `\n${d}`);
+      parade += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
+      if (details['MC(Ag-)'].length) details['MC(Ag-)'].forEach(d => parade += `\n${d}`);
+      parade += `\nMC(Ag+): ${counts['MC(Ag+)']}`;
+      parade += `\nHL: ${counts['HL']}\nOIL: ${counts['OIL']}\nLEAVE: ${counts['LEAVE']}`;
+      if (details['LEAVE'].length) details['LEAVE'].forEach(d => parade += `\n${d}`);
+      parade += `\nOTH: ${counts['OTH']}\nLATE: ${counts['LATE']}`;
+      if (details['LATE'].length) details['LATE'].forEach(d => parade += `\n${d}`);
+      parade += `\nPresent Strength: ${presentCount}`;
 
-        // Hide login screen and show main app structure
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('attendance-tab').classList.add('active'); // Show attendance tab by default
-        document.getElementById('loadingState').classList.add('hidden');
-        currentUser = identity; // Update global user object
-        if (!identity.name || identity.name === "") { // Check if name is missing (needs registration)
-          document.getElementById('registerState').classList.remove('hidden');
-          document.getElementById('regEmail').textContent = identity.email;
-          return;
-        }
-        document.getElementById('appContent').classList.remove('hidden');
-        document.getElementById('registerState').classList.add('hidden');
-        document.getElementById('displayUserName').textContent = identity.name;
-        document.getElementById('displayUserEmail').textContent = identity.email;
-        // Load parade state on first app load
-        refreshParadeState();
-      }
+      document.getElementById('formattedParadeState').textContent = parade;
+      btn.textContent = '✅ Generated!';
+      setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('formattedParadeState').textContent = "Error generating parade state.";
+      btn.textContent = 'Error!';
+      setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+    });
+}
 
-      // --- Modified selectRole to simulate role selection and trigger auth flow ---
-      // REMOVED selectRole function as it's no longer used
+// --- MISSING ATTENDANCE ---
+function generateMissingAttendance() {
+  const btn = document.querySelector('.generate-btn');
+  const originalText = btn.textContent;
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
 
+  const today = new Date();
+  const todayStr = `${today.getDate().toString().padStart(2,'0')}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getFullYear()}`;
 
-      // Initialize the app when the page loads
-      window.onload = () => {
-         initializeAppWithAuth(); // Start the auth check flow after Firebase is initialized
-      };
-
-      // --- Updated functions to remove google.script.run ---
-      function refreshMissingAttendance() {
-        // TODO: Replace with Firebase call to get missing attendance data
-        console.log("Refreshing missing attendance...");
-        // Example: Call a Cloud Function or query Firestore
-        // fetchMissingAttendanceFromFirebase()
-        //  .then(data => {
-        //    cachedMissingData = data;
-        //    const formattedMissingAttendance = data.join('\n');
-        //    document.getElementById('formattedMissingAttendance').textContent = formattedMissingAttendance;
-        //  })
-        //  .catch(error => {
-        //    console.error("Error refreshing missing attendance:", error);
-        //    document.getElementById('formattedMissingAttendance').innerHTML = '<div style="color:#dc2626">Failed to load missing attendance</div>';
-        //  });
-
-        // Placeholder: Simulate loading
-        setTimeout(() => {
-          document.getElementById('formattedMissingAttendance').textContent = "Simulated Missing Attendance Data\n- Person A\n- Person B";
-        }, 500);
-      }
-
-      function refreshParadeState() {
-        // TODO: Replace with Firebase call to get parade state data
-        console.log("Refreshing parade state...");
-        // Example: Call a Cloud Function or query Firestore
-        // fetchParadeStateFromFirebase()
-        //  .then(data => {
-        //    cachedParadeData = data;
-        //    const formattedParadeState = data.join('\n');
-        //    document.getElementById('formattedParadeState').textContent = formattedParadeState;
-        //  })
-        //  .catch(error => {
-        //    console.error("Error refreshing parade state:", error);
-        //    document.getElementById('formattedParadeState').innerHTML = '<div style="color:#dc2626">Failed to load parade state</div>';
-        //  });
-
-        // Placeholder: Simulate loading
-         setTimeout(() => {
-          document.getElementById('formattedParadeState').textContent = "Simulated Parade State Data\nCourse: Example Course\nTotal Strength: 10\nPresent: 8\nRSI: 1\nLeave: 1";
-        }, 500);
-
-        // Refresh missing attendance too
-        refreshMissingAttendance();
-      }
-
-      function generateParadeState() {
-        const btn = document.querySelector('.generate-btn');
-        const originalText = btn.textContent;
-        btn.textContent = 'Generating...';
-        btn.disabled = true;
-
-        // TODO: Replace with Firebase call to generate/update parade state
-        console.log("Generating parade state...");
-        // Example: Call a Cloud Function
-        // generateParadeStateInFirebase()
-        //  .then(data => {
-        //    const formattedParadeState = data.join('\n');
-        //    document.getElementById('formattedParadeState').textContent = formattedParadeState;
-        //    btn.textContent = '✅ Generated!';
-        //  })
-        //  .catch(error => {
-        //    console.error("Error generating parade state:", error);
-        //    btn.textContent = 'Error!';
-        //  })
-        //  .finally(() => {
-        //    setTimeout(() => {
-        //      btn.textContent = originalText;
-        //      btn.disabled = false;
-        //    }, 2000);
-        //  });
-
-        // Placeholder: Simulate generation
-         setTimeout(() => {
-          document.getElementById('formattedParadeState').textContent = "Simulated Generated Parade State Data\nCourse: Example Course\nTotal Strength: 10\nPresent: 8\nRSI: 1\nLeave: 1";
+  db.collection("users").get()
+    .then(userSnap => {
+      const allUsers = userSnap.docs.map(d => ({ uid: d.id, name: d.data().name }));
+      return db.collection("attendance_logs")
+        .where("date", "==", todayStr)
+        .get()
+        .then(logSnap => {
+          const presentUids = new Set(logSnap.docs.map(d => d.data().uid));
+          const missing = allUsers.filter(u => !presentUids.has(u.uid)).map(u => u.name);
+          const text = missing.length > 0 ? missing.join('\n') : "All personnel have submitted attendance!";
+          document.getElementById('formattedMissingAttendance').textContent = text;
           btn.textContent = '✅ Generated!';
-          setTimeout(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-          }, 2000);
-        }, 1000);
-      }
-
-      function generateMissingAttendance() {
-        const btn = document.querySelector('.generate-btn');
-        const originalText = btn.textContent;
-        btn.textContent = 'Generating...';
-        btn.disabled = true;
-
-        // TODO: Replace with Firebase call to generate missing attendance list
-        console.log("Generating missing attendance...");
-        // Example: Call a Cloud Function
-        // generateMissingAttendanceInFirebase()
-        //  .then(data => {
-        //    const formattedMissingAttendance = data.join('\n');
-        //    document.getElementById('formattedMissingAttendance').textContent = formattedMissingAttendance;
-        //    btn.textContent = '✅ Generated!';
-        //  })
-        //  .catch(error => {
-        //    console.error("Error generating missing attendance:", error);
-        //    btn.textContent = 'Error!';
-        //  })
-        //  .finally(() => {
-        //    setTimeout(() => {
-        //      btn.textContent = originalText;
-        //      btn.disabled = false;
-        //    }, 2000);
-        //  });
-
-        // Placeholder: Simulate generation
-         setTimeout(() => {
-          document.getElementById('formattedMissingAttendance').textContent = "Simulated Generated Missing Attendance Data\n- Person A\n- Person B";
-          btn.textContent = '✅ Generated!';
-          setTimeout(() => {
-            btn.textContent = originalText;
-            btn.disabled = false;
-          }, 2000);
-        }, 1000);
-      }
-
-      function handleRegister() {
-        const name = document.getElementById('regNameInput').value.trim();
-        if (name.length < 3) return alert("Please enter your Rank & Name");
-
-        document.getElementById('mainApp').classList.add('loading');
-
-        // TODO: Replace with Firebase call to save user name and role to Firestore
-        console.log("Registering user:", name, currentUser.uid, currentUser.intendedRole);
-        // Example: Save to Firestore
-        const userRef = db.collection("users").doc(currentUser.uid);
-        userRef.set({
-          name: name,
-          email: currentUser.email,
-          role: currentUser.intendedRole || "trainee", // Use the role selected earlier or default
-          registeredAt: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
-        }).then(() => {
-          console.log("User registered in Firestore successfully!");
-          currentUser.name = name; // Update local state
-          currentUser.role = currentUser.intendedRole || "trainee"; // Update local state
-          initApp(currentUser); // Re-initialize app with new data
-          alert("Setup successful!");
-        }).catch((error) => {
-          console.error("Error registering user in Firestore:", error);
-          alert("Registration failed. Please try again.");
-        }).finally(() => {
-            document.getElementById('mainApp').classList.remove('loading');
+          setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
         });
+    })
+    .catch(err => {
+      document.getElementById('formattedMissingAttendance').textContent = "Error loading missing list.";
+      btn.textContent = 'Error!';
+      setTimeout(() => { btn.textContent = originalText; btn.disabled = false; }, 2000);
+    });
+}
 
-        // Placeholder: Simulate registration success
-        // setTimeout(() => {
-        //   document.getElementById('mainApp').classList.remove('loading');
-        //   currentUser.name = name;
-        //   currentUser.role = currentUser.intendedRole; // Use the role selected earlier
-        //   initApp(currentUser);
-        //   alert("Setup successful!");
-        // }, 1000);
-      }
+// --- UTILS ---
+function copyFormattedParadeState() {
+  const text = document.getElementById('formattedParadeState').textContent;
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+}
 
-      // --- Other functions remain largely the same, but calls inside need updating ---
-      function switchTab(tab) {
-        document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
-        document.getElementById(`${tab}-tab`).classList.add('active');
-        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-        if (tab === 'parade') {
-          refreshParadeState();
-        } else if (tab === 'missing') {
-          refreshMissingAttendance();
-        }
-      }
+function copyMissingList() {
+  const text = document.getElementById('formattedMissingAttendance').textContent;
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+}
 
-      function copyFormattedParadeState() {
-        const paradeState = document.getElementById('formattedParadeState').textContent;
-        const btn = event.target;
-        const orig = btn.textContent;
-        btn.textContent = '✅ Copied!';
-        navigator.clipboard.writeText(paradeState)
-          .then(() => {
-            setTimeout(() => {
-              btn.textContent = orig;
-            }, 2000);
-          })
-          .catch(() => {
-            setTimeout(() => {
-              btn.textContent = orig;
-            }, 2000);
-          });
-      }
+function submitStatus(status) {
+  currentStatus = status;
+  openConfirmation({
+    name: currentUser.name,
+    status,
+    details: status === 'Present' ? "At Unit" : "",
+    locationOrTime: "N/A",
+    uid: currentUser.uid,
+    email: currentUser.email
+  });
+}
 
-      function copyMissingList() {
-        const missingAttendance = document.getElementById('formattedMissingAttendance').textContent;
-        const btn = event.target;
-        const orig = btn.textContent;
-        btn.textContent = '✅ Copied!';
-        navigator.clipboard.writeText(missingAttendance)
-          .then(() => {
-            setTimeout(() => {
-              btn.textContent = orig;
-            }, 2000);
-          })
-          .catch(() => {
-            setTimeout(() => {
-              btn.textContent = orig;
-            }, 2000);
-          });
-      }
-
-      function showForm(type) {
-        currentStatus = type;
-        const container = document.getElementById('formInputs');
-        document.getElementById('dynamicForm').style.display = 'block';
-        document.getElementById('formTitle').textContent = `${type} Details`;
-        container.innerHTML = "";
-
-        if (type === 'RSO') {
-          container.innerHTML = `
-            <label>Symptoms</label>
-            <input id="d1" placeholder="Symptoms" required>
-            <label>Location</label>
-            <input id="d2" placeholder="RSO Location (eg. choa chu kang polyclinic , HMI Onecare Boon Lay)" required>`;
-        } else if (type === 'MC') {
-          const today = new Date().toISOString().split('T')[0];
-          container.innerHTML = `
-            <label>Start Date (dd/mm/yyyy)</label>
-            <input type="date" id="d1" min="${today}" required>
-            <label>End Date (dd/mm/yyyy)</label>
-            <input type="date" id="d2" min="${today}" required>`;
-
-          setTimeout(() => {
-            const d1 = document.getElementById('d1');
-            const d2 = document.getElementById('d2');
-            if (d1 && d2) {
-              d1.addEventListener('change', () => {
-                d2.min = d1.value || today;
-                if (d2.value && d2.value < d1.value) {
-                  d2.value = d1.value;
-                }
-              });
-
-              d2.addEventListener('change', () => {
-                if (d1.value && d2.value && d2.value < d1.value) {
-                  d2.value = d1.value;
-                }
-              });
-            }
-          }, 0);
-
-        } else if (type === 'RSI') {
-          container.innerHTML = `<input id="d1" placeholder="Symptoms" required>`;
-        } else if (type === 'Late') {
-          container.innerHTML = `
-            <input id="d1" placeholder="Reason" required>
-            <label>Estimated Arrival</label><input type="time" id="d2" required>`;
-        } else if (type === 'Leave') {
-          container.innerHTML = `
-            <select id="d1" required>
-              <option value="">-- Select --</option>
-              <option>Full-Day</option>
-              <option>Half-Day (AM)</option>
-              <option>Half-Day (PM)</option>
-            </select>`;
-        }
-      }
-
-      function validateAndStage() {
-        const d1 = document.getElementById('d1');
-        const d2 = document.getElementById('d2');
-        if (d1 && !d1.value.trim()) { alert("Please fill in required field"); d1.focus(); return; }
-        if (d2 && !d2.value.trim()) { alert("Please fill in required field"); d2.focus(); return; }
-
-        openConfirmation({
-          name: currentUser.name,
-          status: currentStatus,
-          details: d1 ? d1.value.trim() : "",
-          locationOrTime: d2 ? d2.value.trim() : "N/A"
-        });
-      }
-
-      function openConfirmation(data) {
-        confirmationPayload = data; // Store payload globally
-        const modal = document.getElementById('confirmModal');
-        document.getElementById('summaryContent').innerHTML = `
-          <div class="summary-item"><span class="summary-label">Name:</span> ${data.name}</div>
-          <div class="summary-item"><span class="summary-label">Status:</span> ${data.status}</div>
-          <div class="summary-item"><span class="summary-label">Details:</span> ${data.details || '-'}</div>
-          <div class="summary-item"><span class="summary-label">Info:</span> ${data.locationOrTime}</div>
-        `;
-        modal.style.display = 'flex';
-      }
-
-      function finalSubmit() {
-        // const modal = document.getElementById('confirmModal'); // Not needed as payload is global
-        // const payload = JSON.parse(modal.dataset.payload || '{}'); // Not needed as payload is global
-        const payload = confirmationPayload; // Use the global variable
-        closeModal('confirmModal');
-
-        document.getElementById('mainApp').classList.add('loading');
-
-        // TODO: Replace with Firebase call to process submission
-        console.log("Submitting attendance:", payload);
-        // Example: Save to Firestore logs collection
-        const logEntry = {
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
-          userId: currentUser.uid,
-          name: currentUser.name,
-          status: payload.status,
-          details: payload.details,
-          locationOrTime: payload.locationOrTime,
-          submittedBy: currentUser.uid
-        };
-        db.collection("logs").add(logEntry).then((docRef) => {
-          console.log("Attendance logged successfully with ID: ", docRef.id);
-          // Optionally, update attendance collection for the specific day/user
-          const today = new Date().toISOString().split('T')[0];
-          const attendanceRef = db.collection("attendance").doc(`${today}_${currentUser.uid}`);
-          return attendanceRef.set({
-             ...logEntry,
-             date: today // Add date field
-          });
-        }).then(() => {
-          console.log("Attendance record updated in daily collection.");
-        }).catch((error) => {
-          console.error("Error submitting attendance:", error);
-          alert("Submission failed. Please try again.");
-        }).finally(() => {
-          document.getElementById('mainApp').classList.remove('loading');
-          alert("Submitted successfully ✓");
-          document.getElementById('dynamicForm').style.display = 'none';
-          document.getElementById('statusMsg').textContent = "";
-          refreshParadeState(); // refresh parade state after submit
-          refreshMissingAttendance(); // refresh missing attendance after submit
-        });
-
-
-        // Placeholder: Simulate submission success
-        // setTimeout(() => {
-        //   document.getElementById('mainApp').classList.remove('loading');
-        //   alert("Submitted successfully ✓");
-        //   document.getElementById('dynamicForm').style.display = 'none';
-        //   document.getElementById('statusMsg').textContent = "";
-        //   refreshParadeState(); // refresh parade state after submit
-        //   refreshMissingAttendance(); // refresh missing attendance after submit
-        // }, 1000);
-
-        // OLD CODE REPLACED:
-        /*
-        google.script.run
-          .withSuccessHandler(() => {
-            document.getElementById('mainApp').classList.remove('loading');
-            alert("Submitted successfully ✓");
-            document.getElementById('dynamicForm').style.display = 'none';
-            document.getElementById('statusMsg').textContent = "";
-            refreshParadeState(); // refresh parade state after submit
-            refreshMissingAttendance(); // refresh missing attendance after submit
-          })
-          .withFailureHandler(err => {
-            document.getElementById('mainApp').classList.remove('loading');
-            alert("Submission failed:\n" + err.message);
-          })
-          .processSubmission(payload);
-        */
-      }
-
-      function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-      }
-
-      // --- Removed getDistance function ---
-      /*
-      function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371000;
-        const φ1 = lat1 * Math.PI/180;
-        const φ2 = lat2 * Math.PI/180;
-        const Δφ = (lat2-lat1) * Math.PI/180;
-        const Δλ = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-      }
-      */
-
-
-      // --- Firebase Authentication Functions ---
-      async function signInWithGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-          await auth.signInWithPopup(provider);
-          // onAuthStateChanged will handle the rest
-        } catch (error) {
-          console.error("Google sign-in error:", error);
-          alert("Google sign-in failed: " + error.message);
-        }
-      }
-
-      function showEmailSignIn() {
-        document.getElementById('emailSignInModal').style.display = 'flex';
-      }
-
-      async function performEmailSignIn() {
-        const email = document.getElementById('emailInput').value.trim();
-        const password = document.getElementById('passwordInput').value.trim();
-
-        if (!email || !password) {
-          alert("Please enter both email and password.");
-          return;
-        }
-
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          // onAuthStateChanged will handle the rest
-          closeModal('emailSignInModal');
-        } catch (error) {
-          console.error("Email sign-in error:", error);
-          alert("Email sign-in failed: " + error.message);
-        }
-      }
-
-      async function signInWithPhone() {
-        const phoneNumber = document.getElementById('phoneInput').value.trim();
-        if (!phoneNumber) {
-          alert("Please enter a phone number.");
-          return;
-        }
-
-        try {
-          // Render the reCAPTCHA widget
-          if (!recaptchaVerifier) {
-            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('phoneSignInModal', {
-              'size': 'invisible', // Or 'normal'
-              'callback': (response) => {
-                console.log("reCAPTCHA solved, allowing phone auth.");
-              },
-              'expired-callback': () => {
-                console.warn("reCAPTCHA expired.");
-                alert("reCAPTCHA expired. Please try again.");
-              }
-            });
-          }
-
-          // Send verification code
-          const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
-          window.confirmationResult = confirmationResult; // Store globally for verification step
-
-          // Show the verification code input section
-          document.getElementById('verificationCodeSection').style.display = 'block';
-          document.getElementById('phoneSignInModal').scrollIntoView({ behavior: 'smooth' }); // Scroll to input
-
-        } catch (error) {
-          console.error("Phone sign-in error:", error);
-          alert("Phone sign-in failed: " + error.message);
-        }
-      }
-
-      async function verifyPhoneCode() {
-        const code = document.getElementById('verificationCodeInput').value.trim();
-        if (!code) {
-          alert("Please enter the verification code.");
-          return;
-        }
-
-        try {
-          if (!window.confirmationResult) {
-            throw new Error("No verification code request pending.");
-          }
-          await window.confirmationResult.confirm(code);
-          // onAuthStateChanged will handle the rest
-          closeModal('phoneSignInModal');
-          // Clean up the confirmation result and recaptcha verifier after successful login
-          window.confirmationResult = null;
-          if (recaptchaVerifier) {
-             recaptchaVerifier.clear();
-             recaptchaVerifier = null;
-          }
-        } catch (error) {
-          console.error("Phone verification error:", error);
-          alert("Verification failed: " + error.message);
-        }
-      }
-
-
-    </script>
-  </body>
+// On load: show auth modal
+window.onload = () => {
+  // If already logged in, skip modal
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      handleAuthSuccess(user);
+    } else {
+      document.getElementById('authModal').style.display = 'flex';
+    }
+  });
+};
+</script>
+</body>
 </html>
