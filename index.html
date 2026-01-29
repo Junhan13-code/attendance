@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- TODO: Add Firebase SDK Scripts here -->
+  <!-- Example (replace with your actual Firebase config from the console): -->
+  <!--
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  -->
+
+  <style>
+    :root { --primary: #2563eb; --bg: #f8fafc; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin:0; padding:20px; display:flex; justify-content:center; min-height:100vh; }
+    .container { background:white; padding:24px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.08); width:100%; max-width:460px; }
+    .tab-nav { display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:20px; }
+    .tab-button { flex:1; padding:12px; background:none; border:none; font-weight:600; color:#64748b; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.18s; }
+    .tab-button.active { color:var(--primary); border-bottom-color:var(--primary); }
+    .tab-button:hover:not(.active) { background:#f8fafc; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    h2 { margin:0 0 8px; text-align:center; color:#1e293b; }
+    .user-info-box { background:#e0f2fe; padding:16px; border-radius:8px; text-align:center; border:1px solid #bae6fd; margin-bottom:24px; }
+    .user-name { font-weight:600; font-size:1.1rem; }
+    .user-email { font-size:0.82rem; color:#0369a1; opacity:0.85; }
+    label { display:block; margin:16px 0 6px; font-weight:600; font-size:0.9rem; color:#475569; }
+    input, select { width:100%; padding:11px; border:1px solid #d1d5db; border-radius:6px; font-size:1rem; box-sizing:border-box; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
+    button { padding:12px; border:none; border-radius:6px; color:white; font-weight:600; cursor:pointer; transition:all 0.15s; }
+    button:active { transform:scale(0.98); opacity:0.92; }
+    .btn-present { background:#059669; grid-column:span 2; }
+    .btn-rso     { background:#d97706; }
+    .btn-mc      { background:#dc2626; }
+    .btn-rsi     { background:#7c3aed; }
+    .btn-late    { background:#4b5563; }
+    .btn-leave   { background:var(--primary); grid-column:span 2; }
+    .btn-register,.btn-confirm { background:var(--primary); margin-top:12px; }
+    .btn-cancel   { background:#ef4444; margin-top:12px; }
+    #dynamicForm { border-top:1px solid #e2e8f0; margin-top:20px; padding-top:12px; display:none; }
+    #statusMsg { text-align:center; margin-top:16px; font-weight:600; min-height:1.4em; color:#059669; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000; }
+    .modal-content { background:white; padding:24px; border-radius:12px; width:90%; max-width:360px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.25); }
+    .summary-box { background:#f1f5f9; padding:12px; border-radius:8px; margin:16px 0; text-align:left; font-size:0.92rem; }
+    .summary-item { margin:6px 0; }
+    .summary-label { font-weight:600; color:#475569; }
+    .parade-item { padding:8px 12px; background:#f8fafc; border-radius:6px; margin-bottom:8px; border-left:3px solid var(--primary); }
+    .copy-button { background:var(--primary); color:white; padding:10px 16px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:12px; }
+    .hidden { display:none !important; }
+    .loading { opacity:0.4; pointer-events:none; }
+    .center-box { text-align:center; padding:60px 20px 40px; }
+    .big-icon { font-size:3.2rem; margin-bottom:16px; }
+
+    .missing-item {
+      padding:8px 12px;
+      background:#fffbeb;
+      border-radius:6px;
+      margin-bottom:8px;
+      border-left:3px solid #f59e0b;
+    }
+
+    /* New styles for parade state editing */
+    .parade-edit-section {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .parade-edit-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .parade-edit-input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .parade-edit-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #475569;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .update-parade-btn {
+      background-color: #10b981;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .update-parade-btn:hover {
+      background-color: #059669;
+    }
+
+    .formatted-parade-state {
+      background-color: #f8fafc;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-line;
+      margin-top: 15px;
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .parade-refresh-section {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .parade-refresh-btn {
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .parade-refresh-btn:hover {
+      background-color: #2563eb;
+    }
+
+    .generate-btn {
+      background-color: #f59e0b;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .generate-btn:hover {
+      background-color: #d97706;
+    }
+    /* Add these CSS rules to the existing style section */
+    .missing-edit-section {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .missing-refresh-section {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .missing-refresh-btn {
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .missing-refresh-btn:hover {
+      background-color: #2563eb;
+    }
+
+    .formatted-missing-attendance {
+      background-color: #f8fafc;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-line;
+      margin-top: 15px;
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Role Selection Modal -->
+  <div id="roleSelectionModal" class="modal-overlay" style="display: flex;">
+    <div class="modal-content">
+      <h3>Select Your Role</h3>
+      <button class="btn-trainee" onclick="selectRole('trainee')" style="background:#2563eb; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Trainee</button>
+      <button class="btn-instructor" onclick="selectRole('instructor')" style="background:#dc2626; color:white; padding:12px; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin:10px 0; width:100%;">Instructor</button>
+    </div>
+  </div>
+
+  <div class="container" id="mainApp" style="display:none;">
+    <h2>Firebase Attendance App</h2> <!-- Placeholder Title -->
+    <p style="text-align:center; font-size:0.85rem; color:#64748b; margin:0 0 20px;">Made by 56th Mech Tribe 5</p>
+    <div class="tab-nav">
+      <button class="tab-button active" onclick="switchTab('attendance')">Attendance</button>
+      <button class="tab-button" onclick="switchTab('parade')">Parade State</button>
+      <button class="tab-button" onclick="switchTab('missing')">Missing Attendance</button>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div id="attendance-tab" class="tab-content active">
+      <div id="loadingState" style="padding:40px 0; text-align:center;">Verifying identity...</div>
+      <div id="registerState" class="hidden center-box">
+        <div class="big-icon">👋</div>
+        <h3>Welcome!</h3>
+        <p>Please enter your <strong>Rank & Name</strong><br>to complete setup.</p>
+        <input type="text" id="regNameInput" placeholder="e.g. ME1T Jun Han" autocomplete="off">
+        <button class="btn-register" onclick="handleRegister()">Complete Setup</button>
+      </div>
+      <div id="appContent" class="hidden">
+        <div class="user-info-box">
+          Hello, <span class="user-name" id="displayUserName"></span>
+          <div class="user-email" id="displayUserEmail"></div>
+        </div>
+        <div class="grid">
+          <!-- Updated button text and onclick handler -->
+          <button class="btn-present" onclick="handlePresentSimple()">📍 Present</button>
+          <button class="btn-rso" onclick="showForm('RSO')">RSO</button>
+          <button class="btn-mc" onclick="showForm('MC')">MC</button>
+          <button class="btn-rsi" onclick="showForm('RSI')">RSI</button>
+          <button class="btn-late" onclick="showForm('Late')">Late</button>
+          <button class="btn-leave" onclick="showForm('Leave')">Leave</button>
+        </div>
+        <div id="dynamicForm">
+          <h3 id="formTitle">Details</h3>
+          <div id="formInputs"></div>
+          <button style="background:#1e293b; width:100%; margin-top:12px;" onclick="validateAndStage()">Review & Submit</button>
+        </div>
+      </div>
+      <div id="statusMsg"></div>
+    </div>
+
+    <!-- Missing Attendance Tab -->
+    <div id="missing-tab" class="tab-content">
+      <div class="missing-attendance-container">
+        <h3 style="margin:0 0 12px;">Current Missing Attendance</h3>
+        <div class="missing-edit-section">
+          <h4 style="margin:0 0 10px; color:#475569;">Generate Missing Attendance</h4>
+          <button class="generate-btn" onclick="generateMissingAttendance()">Generate Missing Attendance</button>
+          <div class="missing-refresh-section">
+            <button class="copy-button" onclick="copyMissingList()">📋 Copy All</button>
+          </div>
+        </div>
+        <div id="formattedMissingAttendance" class="formatted-parade-state">Click Generate to create missing attendance</div>
+        <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
+          Source: Firebase Data
+        </p>
+      </div>
+    </div>
+
+    <!-- Parade State Tab -->
+    <div id="parade-tab" class="tab-content">
+      <div class="parade-state-container">
+        <h3 style="margin:0 0 12px;">Current Parade State</h3>
+        <div class="parade-edit-section">
+          <h4 style="margin:0 0 10px; color:#475569;">Generate Parade State</h4>
+          <button class="generate-btn" onclick="generateParadeState()">Generate Parade State</button>
+          <div class="parade-refresh-section">
+            <button class="copy-button" onclick="copyFormattedParadeState()">📋 Copy All</button>
+          </div>
+        </div>
+        <div id="formattedParadeState" class="formatted-parade-state">Click Generate to create parade state</div>
+        <p style="margin-top:16px; font-size:0.82rem; color:#64748b; text-align:center;">
+          Source: Firebase Data
+        </p>
+      </div>
+    </div>
+
+    <div id="confirmModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3>Confirm Submission</h3>
+        <div class="summary-box" id="summaryContent"></div>
+        <button class="btn-confirm" onclick="finalSubmit()">Yes, Submit</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+
+    <script>
+      // --- Removed geolocation constants ---
+      // const AFTC_LAT  = 1.3500;
+      // const AFTC_LNG  = 103.8991;
+      // const RADIUS_M  = 250;
+
+      let currentUser = { name:"", email:"", uid: "", role: "trainee" }; // Added uid and role
+      let currentStatus = "";
+      let cachedParadeData = null;
+      let cachedMissingData = null;
+
+      // --- Removed old handlePresent function ---
+      /*
+      function handlePresent() {
+        document.getElementById('statusMsg').textContent = "Getting location...";
+
+        if (!navigator.geolocation) return alert("Location services not supported");
+
+        navigator.geolocation.getCurrentPosition(pos => {
+          const dist = getDistance(pos.coords.latitude, pos.coords.longitude, AFTC_LAT, AFTC_LNG);
+          const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+
+          if (dist <= RADIUS_M) {
+            openConfirmation({
+              name: currentUser.name,
+              status: "Present",
+              details: "At AFTC",
+              locationOrTime: "N/A",
+              coords
+            });
+          } else {
+            alert(`You are ~${Math.round(dist)} m away from AFTC.\nPlease move closer.`);
+          }
+          document.getElementById('statusMsg').textContent = "";
+        }, () => {
+          alert("Location access denied.\nPlease enable GPS / location permission.");
+          document.getElementById('statusMsg').textContent = "";
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+      }
+      */
+
+      // --- NEW Simplified handlePresent function ---
+      function handlePresentSimple() {
+        // Assuming user identity (name, email, uid) is already established via Firebase Auth
+        // No location check needed anymore
+        openConfirmation({
+          name: currentUser.name,
+          status: "Present",
+          details: "Attendance taken",
+          locationOrTime: "N/A" // Or maybe current time?
+        });
+      }
+
+      // --- Placeholder Functions for Firebase Integration ---
+      // You will replace these with actual Firebase SDK calls
+      const firebaseConfig = {
+        apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
+        authDomain: "attendance-idrus.firebaseapp.com",
+        projectId: "attendance-idrus",
+        storageBucket: "attendance-idrus.firebasestorage.app",
+        messagingSenderId: "561467450966",
+        appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
+        measurementId: "G-9TBLYGP4P5"
+      };
+      async function initializeAppWithAuth() {
+        // This function should be called after Firebase SDK is loaded and initialized
+        // It handles the auth state listener
+        firebase.auth().onAuthStateChanged(async (user) => {
+          if (user) {
+            // User is signed in
+            console.log("User logged in:", user.uid, user.email);
+            // Fetch user details (name, role) from Firestore using user.uid
+            await fetchUserDataFromFirestore(user.uid, user.email);
+          } else {
+            // User is signed out
+            console.log("No user logged in");
+            // Show login screen or redirect to auth page
+            // For now, just hide the app
+             document.getElementById('loadingState').textContent = "Please log in.";
+             document.getElementById('roleSelectionModal').style.display = 'none';
+             document.getElementById('mainApp').style.display = 'none';
+          }
+        });
+      }
+
+      async function fetchUserDataFromFirestore(uid, email) {
+        // TODO: Implement Firestore call to get user details (name, role) based on UID
+        // Example pseudo-code:
+        // const docRef = doc(db, "users", uid);
+        // const docSnap = await getDoc(docRef);
+        // if (docSnap.exists()) {
+        //   const userData = docSnap.data();
+        //   currentUser.name = userData.name || "Unknown User";
+        //   currentUser.role = userData.role || "trainee";
+        //   currentUser.email = email; // From auth
+        //   currentUser.uid = uid;     // From auth
+        //   initApp(currentUser); // Continue app initialization
+        // } else {
+        //   // User not found in Firestore, might need registration step
+        //   currentUser.email = email;
+        //   currentUser.uid = uid;
+        //   showRegistrationPrompt(); // Show registration form if needed
+        // }
+
+        // Placeholder: Simulate finding user data or needing registration
+        // Replace this with actual Firestore logic
+        const foundUser = true; // Simulate user found
+        if (foundUser) {
+          // Simulate fetched data
+          currentUser.name = "Simulated User Name"; // Replace with actual data from Firestore
+          currentUser.role = "trainee"; // Replace with actual data from Firestore
+          currentUser.email = email;
+          currentUser.uid = uid;
+          initApp(currentUser);
+        } else {
+          // User exists in Auth but not in Firestore, needs registration
+          currentUser.email = email;
+          currentUser.uid = uid;
+          showRegistrationPrompt();
+        }
+      }
+
+      function showRegistrationPrompt() {
+         document.getElementById('loadingState').classList.add('hidden');
+         document.getElementById('registerState').classList.remove('hidden');
+         document.getElementById('regEmail').textContent = currentUser.email;
+      }
+
+      // --- Modified initApp to accept user object ---
+      function initApp(identity) {
+        // If user is an unauthorized instructor, show an error and hide the main app
+        // TODO: Check role against instructor email fetched from Firestore settings
+        if (identity.role === "unauthorized_instructor") {
+          alert("You are not authorized as an instructor. Access denied.");
+          document.getElementById('mainApp').style.display = 'none';
+          document.getElementById('roleSelectionModal').style.display = 'flex';
+          return;
+        }
+
+        document.getElementById('loadingState').classList.add('hidden');
+        currentUser = identity; // Update global user object
+        if (!identity.name || identity.name === "") { // Check if name is missing (needs registration)
+          document.getElementById('registerState').classList.remove('hidden');
+          document.getElementById('regEmail').textContent = identity.email;
+          return;
+        }
+        document.getElementById('appContent').classList.remove('hidden');
+        document.getElementById('registerState').classList.add('hidden');
+        document.getElementById('displayUserName').textContent = identity.name;
+        document.getElementById('displayUserEmail').textContent = identity.email;
+        // Load parade state on first app load
+        refreshParadeState();
+      }
+
+      // --- Modified selectRole to simulate role selection and trigger auth flow ---
+      function selectRole(role) {
+        // In a real scenario, role might be determined by Firestore data, not a client-side choice
+        // For now, store the intended role temporarily
+        currentUser.intendedRole = role;
+
+        // Hide the role selection modal
+        document.getElementById('roleSelectionModal').style.display = 'none';
+
+        // Show loading state while checking auth
+        document.getElementById('loadingState').textContent = "Checking authentication...";
+
+        // Trigger the Firebase auth check flow
+        initializeAppWithAuth();
+      }
+
+      window.onload = () => {
+        // Initialize Firebase SDK here if not done elsewhere
+        // firebase.initializeApp(firebaseConfig); // Use your actual config
+        // Call the main initialization logic after SDK loads
+        // initializeAppWithAuth(); // Uncomment after adding Firebase SDK
+      };
+
+      // --- Updated functions to remove google.script.run ---
+      function refreshMissingAttendance() {
+        // TODO: Replace with Firebase call to get missing attendance data
+        console.log("Refreshing missing attendance...");
+        // Example: Call a Cloud Function or query Firestore
+        // fetchMissingAttendanceFromFirebase()
+        //  .then(data => {
+        //    cachedMissingData = data;
+        //    const formattedMissingAttendance = data.join('\n');
+        //    document.getElementById('formattedMissingAttendance').textContent = formattedMissingAttendance;
+        //  })
+        //  .catch(error => {
+        //    console.error("Error refreshing missing attendance:", error);
+        //    document.getElementById('formattedMissingAttendance').innerHTML = '<div style="color:#dc2626">Failed to load missing attendance</div>';
+        //  });
+
+        // Placeholder: Simulate loading
+        setTimeout(() => {
+          document.getElementById('formattedMissingAttendance').textContent = "Simulated Missing Attendance Data\n- Person A\n- Person B";
+        }, 500);
+      }
+
+      function refreshParadeState() {
+        // TODO: Replace with Firebase call to get parade state data
+        console.log("Refreshing parade state...");
+        // Example: Call a Cloud Function or query Firestore
+        // fetchParadeStateFromFirebase()
+        //  .then(data => {
+        //    cachedParadeData = data;
+        //    const formattedParadeState = data.join('\n');
+        //    document.getElementById('formattedParadeState').textContent = formattedParadeState;
+        //  })
+        //  .catch(error => {
+        //    console.error("Error refreshing parade state:", error);
+        //    document.getElementById('formattedParadeState').innerHTML = '<div style="color:#dc2626">Failed to load parade state</div>';
+        //  });
+
+        // Placeholder: Simulate loading
+         setTimeout(() => {
+          document.getElementById('formattedParadeState').textContent = "Simulated Parade State Data\nCourse: Example Course\nTotal Strength: 10\nPresent: 8\nRSI: 1\nLeave: 1";
+        }, 500);
+
+        // Refresh missing attendance too
+        refreshMissingAttendance();
+      }
+
+      function generateParadeState() {
+        const btn = document.querySelector('.generate-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Generating...';
+        btn.disabled = true;
+
+        // TODO: Replace with Firebase call to generate/update parade state
+        console.log("Generating parade state...");
+        // Example: Call a Cloud Function
+        // generateParadeStateInFirebase()
+        //  .then(data => {
+        //    const formattedParadeState = data.join('\n');
+        //    document.getElementById('formattedParadeState').textContent = formattedParadeState;
+        //    btn.textContent = '✅ Generated!';
+        //  })
+        //  .catch(error => {
+        //    console.error("Error generating parade state:", error);
+        //    btn.textContent = 'Error!';
+        //  })
+        //  .finally(() => {
+        //    setTimeout(() => {
+        //      btn.textContent = originalText;
+        //      btn.disabled = false;
+        //    }, 2000);
+        //  });
+
+        // Placeholder: Simulate generation
+         setTimeout(() => {
+          document.getElementById('formattedParadeState').textContent = "Simulated Generated Parade State Data\nCourse: Example Course\nTotal Strength: 10\nPresent: 8\nRSI: 1\nLeave: 1";
+          btn.textContent = '✅ Generated!';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 2000);
+        }, 1000);
+      }
+
+      function generateMissingAttendance() {
+        const btn = document.querySelector('.generate-btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Generating...';
+        btn.disabled = true;
+
+        // TODO: Replace with Firebase call to generate missing attendance list
+        console.log("Generating missing attendance...");
+        // Example: Call a Cloud Function
+        // generateMissingAttendanceInFirebase()
+        //  .then(data => {
+        //    const formattedMissingAttendance = data.join('\n');
+        //    document.getElementById('formattedMissingAttendance').textContent = formattedMissingAttendance;
+        //    btn.textContent = '✅ Generated!';
+        //  })
+        //  .catch(error => {
+        //    console.error("Error generating missing attendance:", error);
+        //    btn.textContent = 'Error!';
+        //  })
+        //  .finally(() => {
+        //    setTimeout(() => {
+        //      btn.textContent = originalText;
+        //      btn.disabled = false;
+        //    }, 2000);
+        //  });
+
+        // Placeholder: Simulate generation
+         setTimeout(() => {
+          document.getElementById('formattedMissingAttendance').textContent = "Simulated Generated Missing Attendance Data\n- Person A\n- Person B";
+          btn.textContent = '✅ Generated!';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 2000);
+        }, 1000);
+      }
+
+      function handleRegister() {
+        const name = document.getElementById('regNameInput').value.trim();
+        if (name.length < 3) return alert("Please enter your Rank & Name");
+
+        document.getElementById('mainApp').classList.add('loading');
+
+        // TODO: Replace with Firebase call to save user name and role to Firestore
+        console.log("Registering user:", name, currentUser.uid, currentUser.intendedRole);
+        // Example: Save to Firestore
+        // const userRef = doc(db, "users", currentUser.uid);
+        // await setDoc(userRef, {
+        //   name: name,
+        //   email: currentUser.email,
+        //   role: currentUser.intendedRole, // Use the role selected earlier
+        //   registeredAt: new Date() // Timestamp
+        // });
+        // currentUser.name = name; // Update local state
+        // currentUser.role = currentUser.intendedRole; // Update local state
+        // initApp(currentUser); // Re-initialize app with new data
+        // alert("Setup successful!");
+
+        // Placeholder: Simulate registration success
+        setTimeout(() => {
+          document.getElementById('mainApp').classList.remove('loading');
+          currentUser.name = name;
+          currentUser.role = currentUser.intendedRole; // Use the role selected earlier
+          initApp(currentUser);
+          alert("Setup successful!");
+        }, 1000);
+      }
+
+      // --- Other functions remain largely the same, but calls inside need updating ---
+      function switchTab(tab) {
+        document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
+        document.getElementById(`${tab}-tab`).classList.add('active');
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        if (tab === 'parade') {
+          refreshParadeState();
+        } else if (tab === 'missing') {
+          refreshMissingAttendance();
+        }
+      }
+
+      function copyFormattedParadeState() {
+        const paradeState = document.getElementById('formattedParadeState').textContent;
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        navigator.clipboard.writeText(paradeState)
+          .then(() => {
+            setTimeout(() => {
+              btn.textContent = orig;
+            }, 2000);
+          })
+          .catch(() => {
+            setTimeout(() => {
+              btn.textContent = orig;
+            }, 2000);
+          });
+      }
+
+      function copyMissingList() {
+        const missingAttendance = document.getElementById('formattedMissingAttendance').textContent;
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        navigator.clipboard.writeText(missingAttendance)
+          .then(() => {
+            setTimeout(() => {
+              btn.textContent = orig;
+            }, 2000);
+          })
+          .catch(() => {
+            setTimeout(() => {
+              btn.textContent = orig;
+            }, 2000);
+          });
+      }
+
+      function showForm(type) {
+        currentStatus = type;
+        const container = document.getElementById('formInputs');
+        document.getElementById('dynamicForm').style.display = 'block';
+        document.getElementById('formTitle').textContent = `${type} Details`;
+        container.innerHTML = "";
+
+        if (type === 'RSO') {
+          container.innerHTML = `
+            <label>Symptoms</label>
+            <input id="d1" placeholder="Symptoms" required>
+            <label>Location</label>
+            <input id="d2" placeholder="RSO Location (eg. choa chu kang polyclinic , HMI Onecare Boon Lay)" required>`;
+        } else if (type === 'MC') {
+          const today = new Date().toISOString().split('T')[0];
+          container.innerHTML = `
+            <label>Start Date (dd/mm/yyyy)</label>
+            <input type="date" id="d1" min="${today}" required>
+            <label>End Date (dd/mm/yyyy)</label>
+            <input type="date" id="d2" min="${today}" required>`;
+
+          setTimeout(() => {
+            const d1 = document.getElementById('d1');
+            const d2 = document.getElementById('d2');
+            if (d1 && d2) {
+              d1.addEventListener('change', () => {
+                d2.min = d1.value || today;
+                if (d2.value && d2.value < d1.value) {
+                  d2.value = d1.value;
+                }
+              });
+
+              d2.addEventListener('change', () => {
+                if (d1.value && d2.value && d2.value < d1.value) {
+                  d2.value = d1.value;
+                }
+              });
+            }
+          }, 0);
+
+        } else if (type === 'RSI') {
+          container.innerHTML = `<input id="d1" placeholder="Symptoms" required>`;
+        } else if (type === 'Late') {
+          container.innerHTML = `
+            <input id="d1" placeholder="Reason" required>
+            <label>Estimated Arrival</label><input type="time" id="d2" required>`;
+        } else if (type === 'Leave') {
+          container.innerHTML = `
+            <select id="d1" required>
+              <option value="">-- Select --</option>
+              <option>Full-Day</option>
+              <option>Half-Day (AM)</option>
+              <option>Half-Day (PM)</option>
+            </select>`;
+        }
+      }
+
+      function validateAndStage() {
+        const d1 = document.getElementById('d1');
+        const d2 = document.getElementById('d2');
+        if (d1 && !d1.value.trim()) { alert("Please fill in required field"); d1.focus(); return; }
+        if (d2 && !d2.value.trim()) { alert("Please fill in required field"); d2.focus(); return; }
+
+        openConfirmation({
+          name: currentUser.name,
+          status: currentStatus,
+          details: d1 ? d1.value.trim() : "",
+          locationOrTime: d2 ? d2.value.trim() : "N/A"
+        });
+      }
+
+      function openConfirmation(data) {
+        const modal = document.getElementById('confirmModal');
+        modal.dataset.payload = JSON.stringify(data);
+        document.getElementById('summaryContent').innerHTML = `
+          <div class="summary-item"><span class="summary-label">Name:</span> ${data.name}</div>
+          <div class="summary-item"><span class="summary-label">Status:</span> ${data.status}</div>
+          <div class="summary-item"><span class="summary-label">Details:</span> ${data.details || '-'}</div>
+          <div class="summary-item"><span class="summary-label">Info:</span> ${data.locationOrTime}</div>
+        `;
+        modal.style.display = 'flex';
+      }
+
+      function finalSubmit() {
+        const modal = document.getElementById('confirmModal');
+        const payload = JSON.parse(modal.dataset.payload || '{}');
+        closeModal();
+
+        document.getElementById('mainApp').classList.add('loading');
+
+        // TODO: Replace with Firebase call to process submission
+        console.log("Submitting attendance:", payload);
+        // Example: Save to Firestore logs collection
+        // const logEntry = {
+        //   timestamp: new Date(), // Server timestamp preferred
+        //   userId: currentUser.uid,
+        //   name: currentUser.name,
+        //   status: payload.status,
+        //   details: payload.details,
+        //   locationOrTime: payload.locationOrTime,
+        //   submittedBy: currentUser.uid
+        // };
+        // await addDoc(collection(db, "logs"), logEntry);
+        // Optionally, update attendance collection for the specific day/user
+        // await setDoc(doc(db, "attendance", `${new Date().toISOString().split('T')[0]}_${currentUser.uid}`), { ...logEntry });
+
+        // Placeholder: Simulate submission success
+        setTimeout(() => {
+          document.getElementById('mainApp').classList.remove('loading');
+          alert("Submitted successfully ✓");
+          document.getElementById('dynamicForm').style.display = 'none';
+          document.getElementById('statusMsg').textContent = "";
+          refreshParadeState(); // refresh parade state after submit
+          refreshMissingAttendance(); // refresh missing attendance after submit
+        }, 1000);
+
+        // OLD CODE REPLACED:
+        /*
+        google.script.run
+          .withSuccessHandler(() => {
+            document.getElementById('mainApp').classList.remove('loading');
+            alert("Submitted successfully ✓");
+            document.getElementById('dynamicForm').style.display = 'none';
+            document.getElementById('statusMsg').textContent = "";
+            refreshParadeState(); // refresh parade state after submit
+            refreshMissingAttendance(); // refresh missing attendance after submit
+          })
+          .withFailureHandler(err => {
+            document.getElementById('mainApp').classList.remove('loading');
+            alert("Submission failed:\n" + err.message);
+          })
+          .processSubmission(payload);
+        */
+      }
+
+      function closeModal() {
+        document.getElementById('confirmModal').style.display = 'none';
+      }
+
+      // --- Removed getDistance function ---
+      /*
+      function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const φ1 = lat1 * Math.PI/180;
+        const φ2 = lat2 * Math.PI/180;
+        const Δφ = (lat2-lat1) * Math.PI/180;
+        const Δλ = (lon2-lon1) * Math.PI/180;
+        const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+      }
+      */
+
+
+    </script>
+  </body>
+</html>
