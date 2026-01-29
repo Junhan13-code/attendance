@@ -378,6 +378,15 @@
 
   <script>
     // 🔐 REPLACE WITH YOUR FIREBASE CONFIG (DO NOT COMMIT TO GITHUB)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAL42bYjqqw-eHW47Y8c_PwgVysBK7n9oE",
+      authDomain: "attendance-idrus.firebaseapp.com",
+      projectId: "attendance-idrus",
+      storageBucket: "attendance-idrus.firebasestorage.app",
+      messagingSenderId: "561467450966",
+      appId: "1:561467450966:web:93b2da8ed9e5e4c5233df7",
+      measurementId: "G-9TBLYGP4P5"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -485,7 +494,7 @@
           showScreen('registerScreen');
         }
       }).catch(err => {
-        console.error("Error fetching user data:", err);
+        console.error("Error fetching user ", err);
         showToast("Failed to load user data", true);
       });
     }
@@ -623,6 +632,14 @@
             details: detailsForStatus, // Use the formatted date range
             info: "N/A" 
           });
+      } else if (currentStatus === 'RSO') {
+          // Format RSO details as "Symptoms, Location"
+          const rsoDetails = `${d1}, ${d2}`;
+          logAttendance({ 
+            status: currentStatus, 
+            details: rsoDetails, // Use the formatted RSO details
+            info: "N/A" 
+          });
       } else {
           logAttendance({ 
             status: currentStatus, 
@@ -679,7 +696,7 @@
         name: currentUser.name,
         email: currentUser.email,
         status: data.status,
-        details: data.details, // This will be the DDMMYY-DDMMYY string for MC/HL/OIL, or description for others
+        details: data.details, // This will be the DDMMYY-DDMMYY string for MC/HL/OIL, Symptoms, Location for RSO, or description for others
         info: data.info,
         date: todayStr, // Date of submission
         time: timeStr, // Time of submission
@@ -781,9 +798,9 @@
                     } else if (log.status === 'RSI') {
                       counts.RSI++;
                       details.RSI.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'RSO') {
+                    } else if (log.status === 'RSO') { // Updated RSO display format
                       counts.RSO++;
-                      details.RSO.push(`${log.name} (${log.details})`);
+                      details.RSO.push(`${log.name} (${log.details})`); // Details already formatted as "Symptoms, Location"
                     } else if (log.status === 'MC') {
                       counts['MC(Ag-)']++;
                       details['MC(Ag-)'].push(`${log.name} (${log.details})`);
@@ -815,7 +832,7 @@ RSI: ${counts.RSI}`;
                   
                   details.RSI.forEach(d => text += `\n${d}`);
                   text += `\nRSO: ${counts.RSO}`;
-                  details.RSO.forEach(d => text += `\n${d}`);
+                  details.RSO.forEach(d => text += `\n${d}`); // This now shows "Name (Symptoms, Location)"
                   text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
                   details['MC(Ag-)'].forEach(d => text += `\n${d}`);
                   text += `\nMC(Ag+): ${counts['MC(Ag+)']}`;
