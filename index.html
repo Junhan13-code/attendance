@@ -8,17 +8,30 @@
   <style>
     :root {
       --primary: #2563eb;
+      --primary-hover: #1d4ed8; /* Darker shade for hover */
       --success: #059669;
+      --success-hover: #047857;
       --warning: #d97706;
+      --warning-hover: #b45309;
       --danger: #dc2626;
+      --danger-hover: #b91c1c;
       --purple: #7c3aed;
+      --purple-hover: #6d28d9;
       --light: #ffffff;
       --gray-50: #f8fafc;
       --gray-100: #f1f5f9;
       --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1; /* Added for borders */
       --gray-800: #1e293b;
-      --border-radius: 12px;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --gray-900: #0f172a; /* Added for darker text */
+      --border-radius-sm: 6px;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition-fast: 0.15s ease;
+      --transition-medium: 0.3s ease;
     }
 
     * { 
@@ -30,40 +43,57 @@
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--gray-50);
-      color: var(--gray-800);
+      color: var(--gray-900);
       line-height: 1.5;
       padding: 16px;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .container {
+      width: 100%;
       max-width: 500px;
-      margin: 0 auto;
       background: var(--light);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
       background: var(--primary);
       color: white;
-      padding: 20px;
+      padding: 20px 24px; /* Increased horizontal padding */
       text-align: center;
       position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-content {
+        flex-grow: 1;
+        text-align: center; /* Center title when logout button is present */
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 8px; /* Space between logout and other actions if needed */
+        margin-left: 16px; /* Push to the right */
     }
     
     .logout-btn {
-      position: absolute;
-      top: 12px;
-      right: 16px;
       background: rgba(255,255,255,0.2);
       border: none;
       color: white;
-      padding: 6px 12px;
-      border-radius: 4px;
+      padding: 8px 12px; /* Increased padding */
+      border-radius: var(--border-radius-sm);
       cursor: pointer;
       font-size: 0.9rem;
+      transition: background var(--transition-fast);
     }
     
     .logout-btn:hover {
@@ -72,11 +102,14 @@
 
     .screen { 
       display: none; 
-      padding: 24px; 
+      padding: 24px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     .screen.active { 
-      display: block; 
+      display: flex; /* Use flex for better internal alignment */
     }
 
     .btn {
@@ -84,23 +117,33 @@
       width: 100%;
       padding: 14px;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--border-radius-md);
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all var(--transition-fast);
       margin-bottom: 12px;
+      text-align: center; /* Ensure text is centered */
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px); /* Subtle lift effect */
+    }
+    
+    .btn:active {
+        transform: translateY(0); /* Reset lift on click */
     }
 
     .btn-google { 
-      background: #f8f9fa; 
-      color: #333; 
-      border: 1px solid var(--gray-200); 
+      background: var(--light); 
+      color: var(--gray-900); 
+      border: 1px solid var(--gray-300); /* Use gray-300 for consistency */
     }
     
     .btn-email { 
       background: var(--gray-100); 
-      color: var(--gray-800); 
+      color: var(--gray-900); 
     }
     
     .btn-admin { 
@@ -113,9 +156,17 @@
       color: white; 
     }
     
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+    
     .btn-success { 
       background: var(--success); 
       color: white; 
+    }
+    
+    .btn-success:hover {
+        background: var(--success-hover);
     }
     
     .btn-warning { 
@@ -123,9 +174,17 @@
       color: white; 
     }
     
+    .btn-warning:hover {
+        background: var(--warning-hover);
+    }
+    
     .btn-danger { 
       background: var(--danger); 
       color: white; 
+    }
+    
+    .btn-danger:hover {
+        background: var(--danger-hover);
     }
     
     .btn-purple { 
@@ -133,9 +192,17 @@
       color: white; 
     }
     
+    .btn-purple:hover {
+        background: var(--purple-hover);
+    }
+    
     .btn-gray { 
       background: var(--gray-100); 
       color: var(--gray-800); 
+    }
+    
+    .btn-gray:hover {
+        background: var(--gray-200); /* Lighter gray on hover */
     }
 
     .form-group { 
@@ -147,14 +214,22 @@
       margin-bottom: 6px; 
       font-weight: 500; 
       font-size: 0.95rem; 
+      color: var(--gray-800); /* Explicit color for labels */
     }
     
     input, select { 
       width: 100%; 
       padding: 12px; 
-      border: 1px solid var(--gray-200); 
-      border-radius: 8px; 
+      border: 1px solid var(--gray-300); /* Consistent border color */
+      border-radius: var(--border-radius-md); 
       font-size: 1rem; 
+      transition: border-color var(--transition-fast);
+    }
+    
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary); /* Highlight on focus */
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); /* Focus ring */
     }
 
     .grid {
@@ -172,27 +247,57 @@
 
     .tab-btn {
       flex: 1;
-      padding: 12px;
+      padding: 14px 12px; /* Increased vertical padding */
       background: none;
       border: none;
       font-weight: 600;
-      color: #64748b;
+      color: var(--gray-600); /* Muted color for inactive tabs */
       cursor: pointer;
       text-align: center;
+      transition: color var(--transition-fast);
+      position: relative; /* For active indicator */
+    }
+    
+    .tab-btn:hover {
+        color: var(--gray-800); /* Slightly darker on hover */
     }
 
     .tab-btn.active {
-      color: var(--primary);
-      border-bottom: 3px solid var(--primary);
+      color: var(--primary); /* Active tab color */
+    }
+    
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px; /* Position at the bottom */
+        left: 0;
+        right: 0;
+        height: 3px; /* Thickness of the indicator */
+        background-color: var(--primary); /* Match primary color */
+        border-radius: 3px 3px 0 0; /* Rounded top edges */
     }
 
     .user-card {
-      background: #eff6ff;
+      background: #eff6ff; /* Light blue background */
       padding: 16px;
-      border-radius: 8px;
+      border-radius: var(--border-radius-md);
       text-align: center;
       margin-bottom: 24px;
-      border: 1px solid #bfdbfe;
+      border: 1px solid #bfdbfe; /* Border color */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .user-card strong {
+        font-size: 1.1rem; /* Slightly larger name */
+        color: var(--gray-900);
+    }
+    
+    .user-card small {
+        color: var(--gray-700); /* Muted email color */
+        font-size: 0.9rem;
+        margin-top: 4px;
     }
 
     .toast {
@@ -200,14 +305,15 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--gray-800);
+      background: var(--gray-900);
       color: white;
       padding: 12px 24px;
-      border-radius: 8px;
+      border-radius: var(--border-radius-md);
       font-weight: 500;
       z-index: 1000;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity var(--transition-medium);
+      box-shadow: var(--shadow-lg);
     }
 
     .toast.show { 
@@ -217,20 +323,23 @@
     .parade-output {
       background: var(--gray-100);
       padding: 16px;
-      border-radius: 8px;
+      border-radius: var(--border-radius-md);
       font-family: monospace;
       white-space: pre-wrap;
       font-size: 0.9rem;
       max-height: 300px;
       overflow-y: auto;
       margin-top: 16px;
+      border: 1px solid var(--gray-200); /* Subtle border */
+      line-height: 1.4; /* Improve readability */
     }
 
     .divider {
       text-align: center;
       margin: 20px 0;
-      color: #94a3b8;
+      color: var(--gray-500); /* Muted divider color */
       position: relative;
+      font-size: 0.9rem;
     }
 
     .divider::before,
@@ -240,7 +349,7 @@
       top: 50%;
       width: 40%;
       height: 1px;
-      background: var(--gray-200);
+      background: var(--gray-300); /* Use gray-300 for consistency */
     }
 
     .divider::before { 
@@ -265,14 +374,43 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+        .grid {
+            grid-template-columns: 1fr; /* Stack buttons on small screens */
+            gap: 8px;
+        }
+        
+        .tab-btn {
+            padding: 12px 8px; /* Smaller padding on small screens */
+            font-size: 0.9rem; /* Slightly smaller text */
+        }
+        
+        .btn {
+            padding: 12px; /* Smaller padding for buttons */
+        }
+        
+        body {
+            padding: 8px; /* Smaller body padding */
+        }
+        
+        .container {
+            border-radius: var(--border-radius-md); /* Slightly smaller radius */
+        }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- Login Screen -->
     <div id="loginScreen" class="screen active">
-      <header><h1>56th Mech Attendance</h1></header>
-      <div style="padding: 24px;">
+      <header>
+          <div class="header-content">
+            <h1>56th Mech Attendance</h1>
+          </div>
+      </header>
+      <div style="padding: 24px 0;"> <!-- Remove padding from parent, add to content area -->
         <p style="text-align:center; margin-bottom:24px;">Sign in to log your attendance</p>
         <button class="btn btn-google" onclick="signInWithGoogle()">🔐 Sign in with Google</button>
         <button class="btn btn-email" onclick="showEmailLogin()">📧 Sign in with Email</button>
@@ -283,14 +421,18 @@
 
     <!-- Email Login -->
     <div id="emailLoginScreen" class="screen">
-      <header><h1>Email Login</h1></header>
-      <div style="padding: 24px;">
+      <header>
+          <div class="header-content">
+            <h1>Email Login</h1>
+          </div>
+      </header>
+      <div style="padding: 24px 0;">
         <div class="form-group">
-          <label>Email</label>
+          <label for="emailInput">Email</label>
           <input type="email" id="emailInput" placeholder="you@example.com">
         </div>
         <div class="form-group">
-          <label>Password</label>
+          <label for="passwordInput">Password</label>
           <input type="password" id="passwordInput" placeholder="••••••••">
         </div>
         <button class="btn btn-primary" onclick="handleEmailLogin()">Sign In</button>
@@ -300,11 +442,15 @@
 
     <!-- Registration (First Time) -->
     <div id="registerScreen" class="screen">
-      <header><h1>Welcome!</h1></header>
-      <div style="padding: 24px;">
+      <header>
+          <div class="header-content">
+            <h1>Welcome!</h1>
+          </div>
+      </header>
+      <div style="padding: 24px 0;">
         <p style="text-align:center; margin-bottom:24px;">Enter your rank and name</p>
         <div class="form-group">
-          <label>Rank & Name (e.g. ME1T John)</label>
+          <label for="regName">Rank & Name (e.g. ME1T John)</label>
           <input type="text" id="regName" placeholder="ME1T John" maxlength="50">
         </div>
         <button class="btn btn-primary" onclick="completeRegistration()">Complete Setup</button>
@@ -314,8 +460,12 @@
     <!-- Main App -->
     <div id="appScreen" class="screen">
       <header>
-        <h1>56th Mech Attendance</h1>
-        <button class="logout-btn" onclick="signOut()">Logout</button>
+        <div class="header-content">
+            <h1>56th Mech Attendance</h1>
+        </div>
+        <div class="header-actions">
+            <button class="logout-btn" onclick="signOut()">Logout</button>
+        </div>
       </header>
       <div class="tab-nav">
         <button class="tab-btn active" onclick="switchTab('attendance')">Attendance</button>
@@ -326,7 +476,7 @@
       <!-- Attendance -->
       <div id="attendanceTab" class="tab-content">
         <div class="user-card">
-          Hello, <strong id="userNameDisplay"></strong><br>
+          <span>Hello,</span> <strong id="userNameDisplay"></strong><br>
           <small id="userEmailDisplay"></small>
         </div>
         <div class="grid">
@@ -350,21 +500,21 @@
       </div>
 
       <!-- Parade -->
-      <div id="paradeTab" class="tab-content" style="display:none;">
+      <div id="paradeTab" class="tab-content" style="display:none; flex-grow: 1; display: flex; flex-direction: column;">
         <button class="btn btn-primary" onclick="generateParadeState()">
           <span id="paradeBtnText">🔄 Generate Parade State</span>
         </button>
         <button class="btn btn-gray" style="margin-top:8px;" onclick="copyParadeState()">📋 Copy All</button>
-        <div class="parade-output" id="paradeOutput">Click "Generate"</div>
+        <div class="parade-output" id="paradeOutput" style="flex-grow: 1; margin-top: 16px;">Click "Generate"</div>
       </div>
 
       <!-- Missing -->
-      <div id="missingTab" class="tab-content" style="display:none;">
+      <div id="missingTab" class="tab-content" style="display:none; flex-grow: 1; display: flex; flex-direction: column;">
         <button class="btn btn-primary" onclick="generateMissingList()">
           <span id="missingBtnText">🔄 Generate Missing List</span>
         </button>
         <button class="btn btn-gray" style="margin-top:8px;" onclick="copyMissingList()">📋 Copy All</button>
-        <div class="parade-output" id="missingOutput">Click "Generate"</div>
+        <div class="parade-output" id="missingOutput" style="flex-grow: 1; margin-top: 16px;">Click "Generate"</div>
       </div>
     </div>
   </div>
@@ -507,460 +657,4 @@
         name: name,
         email: currentUser.email,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        currentUser.name = name;
-        initApp();
-      }).catch(err => {
-        console.error("Registration error:", err);
-        showToast("Setup failed: " + err.message, true);
-      });
-    }
-
-    function registerNewUser(name, email, password) {
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(user => {
-          db.collection("users").doc(user.user.uid).set({
-            name: name,
-            email: email,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(() => {
-            currentUser = { uid: user.user.uid, email, name, role: "trainee" };
-            initApp();
-          });
-        })
-        .catch(err => {
-          console.error("Registration error:", err);
-          showToast("Registration failed: " + err.message, true);
-        });
-    }
-
-    // --- App Init ---
-    function initApp() {
-      document.getElementById('userNameDisplay').textContent = currentUser.name;
-      document.getElementById('userEmailDisplay').textContent = currentUser.email;
-      showScreen('appScreen');
-    }
-
-    // --- Logout ---
-    function signOut() {
-      auth.signOut()
-        .then(() => {
-          currentUser = null;
-          showScreen('loginScreen');
-          showToast("You've been logged out");
-        })
-        .catch(err => {
-          console.error("Logout error:", err);
-          showToast("Logout failed", true);
-        });
-    }
-
-    // --- Attendance Submission (NO GEOLOCATION) ---
-    function submitStatus(status) {
-      if (status === "Present") {
-        logAttendance({ status: "Present", details: "At Unit", info: "N/A" });
-      } else {
-        openForm(status);
-      }
-    }
-
-    function openForm(status) {
-      currentStatus = status;
-      const title = document.getElementById('formTitle');
-      const fields = document.getElementById('formFields');
-      title.textContent = `${status} Details`;
-      let html = "";
-      
-      if (status === 'RSO') {
-        html = `<div class="form-group"><label>Symptoms</label><input id="d1" placeholder="Fever, headache"></div>
-                <div class="form-group"><label>Location</label><input id="d2" placeholder="Choa Chu Kang Polyclinic"></div>`;
-      } else if (['MC', 'HL', 'OIL'].includes(status)) { // Handle date ranges for MC, HL, OIL
-        html = `<div class="form-group"><label>Start Date</label><input type="date" id="d1"></div>
-                <div class="form-group"><label>End Date</label><input type="date" id="d2"></div>`;
-      } else if (status === 'RSI') {
-        html = `<div class="form-group"><label>Symptoms</label><input id="d1" placeholder="Describe symptoms"></div>`;
-      } else if (status === 'Late') {
-        html = `<div class="form-group"><label>Reason</label><input id="d1" placeholder="Traffic jam"></div>
-                <div class="form-group"><label>Arrival Time</label><input type="time" id="d2"></div>`;
-      } else if (status === 'Leave') {
-        html = `<div class="form-group"><label>Type</label>
-                <select id="d1"><option value="">-- Select --</option><option>Full-Day</option><option>Half-Day (AM)</option><option>Half-Day (PM)</option></select></div>`;
-      } else if (status === 'OTH') {
-          html = `<div class="form-group"><label>Specify</label><input id="d1" placeholder="e.g. Compassionate Leave, Marriage"></div>`;
-      }
-      
-      fields.innerHTML = html;
-      document.getElementById('dynamicForm').style.display = 'block';
-    }
-
-    function cancelForm() {
-      document.getElementById('dynamicForm').style.display = 'none';
-    }
-
-    function reviewSubmission() {
-      const d1 = document.getElementById('d1')?.value?.trim() || "";
-      const d2 = document.getElementById('d2')?.value?.trim() || "N/A";
-      
-      if (!d1 && ['RSO','RSI','Late','Leave', 'OTH'].includes(currentStatus)) {
-        return showToast("Please fill required field", true);
-      }
-      
-      if (['MC', 'HL', 'OIL'].includes(currentStatus) && (!d1 || !d2)) {
-        return showToast(`Both start and end dates are required for ${currentStatus}`, true);
-      }
-      
-      if (['MC', 'HL', 'OIL'].includes(currentStatus)) {
-          // Validate dates are in correct format (YYYY-MM-DD from input type=date)
-          const startDate = new Date(d1);
-          const endDate = new Date(d2);
-          
-          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-              return showToast(`Please enter valid dates for ${currentStatus}`, true);
-          }
-          
-          if (endDate < startDate) {
-              return showToast("End date cannot be before start date", true);
-          }
-          
-          // Format dates for details: DDMMYY
-          const startFormatted = formatDateForDetails(startDate);
-          const endFormatted = formatDateForDetails(endDate);
-          const detailsForStatus = `${startFormatted} - ${endFormatted}`;
-          
-          logAttendance({ 
-            status: currentStatus, 
-            details: detailsForStatus, // Use the formatted date range
-            info: "N/A" 
-          });
-      } else if (currentStatus === 'RSO') {
-          // Format RSO details as "Symptoms, Location"
-          const rsoDetails = `${d1}, ${d2}`;
-          logAttendance({ 
-            status: currentStatus, 
-            details: rsoDetails, // Use the formatted RSO details
-            info: "N/A" 
-          });
-      } else {
-          logAttendance({ 
-            status: currentStatus, 
-            details: d1, 
-            info: d2 
-          });
-      }
-      
-      cancelForm();
-    }
-
-    // Helper function to format date as DDMMYY
-    function formatDateForDetails(date) {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-        const year = String(date.getFullYear());
-        // Extract last two digits of the year
-        const shortYear = year.substring(2);
-        return `${day}${month}${shortYear}`;
-    }
-
-    function logAttendance(data) {
-      const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const year = now.getFullYear();
-      const todayStr = `${day}/${month}/${year}`;
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-
-      // Prepare date range for statuses that require it
-      let startDateISO = null;
-      let endDateISO = null;
-      if (['MC', 'HL', 'OIL'].includes(data.status)) {
-          // Parse the formatted date range string back to ISO for storage
-          const dateParts = data.details.split(' - ');
-          if (dateParts.length === 2) {
-              // Assuming format DDMMYY
-              const startPart = dateParts[0];
-              const endPart = dateParts[1];
-              const startDay = startPart.substring(0, 2);
-              const startMonth = startPart.substring(2, 4);
-              const startYear = '20' + startPart.substring(4); // Assumes 20xx century
-              const endDay = endPart.substring(0, 2);
-              const endMonth = endPart.substring(2, 4);
-              const endYear = '20' + endPart.substring(4);
-
-              startDateISO = new Date(Date.UTC(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay))).toISOString();
-              endDateISO = new Date(Date.UTC(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay))).toISOString();
-          }
-      }
-
-      db.collection("attendance_logs").add({
-        uid: currentUser.uid,
-        name: currentUser.name,
-        email: currentUser.email,
-        status: data.status,
-        details: data.details, // This will be the DDMMYY-DDMMYY string for MC/HL/OIL, Symptoms, Location for RSO, or description for others
-        info: data.info,
-        date: todayStr, // Date of submission
-        time: timeStr, // Time of submission
-        startDate: startDateISO, // Store the start date of the range (if applicable)
-        endDate: endDateISO,     // Store the end date of the range (if applicable)
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        showToast("✅ Submitted!");
-        // Force refresh of parade state after submission
-        if (document.getElementById('paradeTab').style.display === 'block') {
-            generateParadeState();
-        }
-        // Force refresh of missing list after submission
-         if (document.getElementById('missingTab').style.display === 'block') {
-            generateMissingList();
-        }
-      }).catch(err => {
-        console.error("Submission error:", err);
-        showToast("Submission failed: " + err.message, true);
-      });
-    }
-
-    // --- Parade State ---
-    function generateParadeState() {
-      const output = document.getElementById('paradeOutput');
-      const btnText = document.getElementById('paradeBtnText');
-      
-      // Show loading state
-      output.textContent = "Loading...";
-      btnText.innerHTML = '<span class="loading-spinner"></span> Generating...';
-      
-      const now = new Date();
-      const todayStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
-      const timeStr = `${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
-
-      // Step 1: Get course name
-      db.collection("settings").doc("course").get()
-        .then(courseDoc => {
-          const course = courseDoc.exists 
-            ? courseDoc.data().name || "56th Mechanical Course" 
-            : "56th Mechanical Course";
-
-          // Step 2: Get ALL registered users (for Total Strength)
-          return db.collection("users").get()
-            .then(userSnap => {
-              const totalStrength = userSnap.size;
-
-              // Step 3: Get TODAY'S attendance logs (considering date ranges)
-              return db.collection("attendance_logs")
-                .orderBy("timestamp", "desc") // Order by timestamp descending to get latest first
-                .get()
-                .then(logSnap => {
-                  // Group logs by UID and take the first one (latest due to order)
-                  const latestLogsByUid = {};
-                  logSnap.forEach(doc => {
-                    const data = doc.data();
-                    const uid = data.uid;
-                    // Only consider logs relevant to TODAY'S parade state
-                    // Check if the log's submission date is today OR if it has a date range that includes today
-                    const submissionDateMatches = data.date === todayStr;
-                    const dateRangeIncludesToday = data.startDate && data.endDate;
-                    if (submissionDateMatches || dateRangeIncludesToday) {
-                        if (!latestLogsByUid[uid]) {
-                            // If this is the first log seen for this UID, store it
-                            latestLogsByUid[uid] = data;
-                        } // Otherwise, skip (as logs are ordered desc, first seen is latest)
-                    }
-                  });
-
-                  // Convert object back to array
-                  const logs = Object.values(latestLogsByUid);
-
-                  // Step 4: Count statuses based on the latest log for each user on/for today
-                  const counts = { 
-                    MA: 0, RSI: 0, RSO: 0, 'MC(Ag-)': 0, 'MC(Ag+)': 0, 
-                    HL: 0, OIL: 0, LEAVE: 0, OTH: 0, LATE: 0
-                  };
-                  const details = { 
-                    RSI: [], RSO: [], 'MC(Ag-)': [], LEAVE: [], LATE: [], HL: [], OIL: [], OTH: []
-                  };
-                  let presentCount = 0; // Count of Present separately
-
-                  logs.forEach(log => {
-                    // Check if the log's date range includes today (or if it's a same-day submission)
-                    const isSameDaySubmission = log.date === todayStr;
-                    const isInRange = log.startDate && log.endDate;
-                    const isActiveToday = isSameDaySubmission || (
-                        new Date(log.startDate).getTime() <= now.getTime() &&
-                        new Date(log.endDate).getTime() >= now.getTime()
-                    );
-
-                    if (!isActiveToday) {
-                        // If the latest log is not active today, it doesn't contribute to today's parade state
-                        return;
-                    }
-
-                    if (log.status === 'Present') {
-                      presentCount++; // Increment Present Strength
-                    } else if (log.status === 'RSI') {
-                      counts.RSI++;
-                      details.RSI.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'RSO') { // Updated RSO display format
-                      counts.RSO++;
-                      details.RSO.push(`${log.name} (${log.details})`); // Details already formatted as "Symptoms, Location"
-                    } else if (log.status === 'MC') {
-                      counts['MC(Ag-)']++;
-                      details['MC(Ag-)'].push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'Leave') {
-                      counts.LEAVE++;
-                      details.LEAVE.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'Late') {
-                      counts.LATE++;
-                      details.LATE.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'HL') { // Added HL
-                      counts.HL++;
-                      details.HL.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'OIL') { // Added OIL
-                      counts.OIL++;
-                      details.OIL.push(`${log.name} (${log.details})`);
-                    } else if (log.status === 'OTH') { // Added OTH
-                      counts.OTH++;
-                      details.OTH.push(`${log.name} (${log.details})`);
-                    }
-                    // MA is manual (from ref code), so it's not incremented here by user submission
-                  });
-
-                  // Step 5: Generate parade state text
-                  let text = `Parade state at ${timeStr} (${todayStr})
-Course: ${course}
-Total Strength: ${totalStrength}
-MA: ${counts.MA}
-RSI: ${counts.RSI}`;
-                  
-                  details.RSI.forEach(d => text += `\n${d}`);
-                  text += `\nRSO: ${counts.RSO}`;
-                  details.RSO.forEach(d => text += `\n${d}`); // This now shows "Name (Symptoms, Location)"
-                  text += `\nMC(Ag-): ${counts['MC(Ag-)']}`;
-                  details['MC(Ag-)'].forEach(d => text += `\n${d}`);
-                  text += `\nMC(Ag+): ${counts['MC(Ag+)']}`;
-                  text += `\nHL: ${counts.HL}`; // Added HL
-                  details.HL.forEach(d => text += `\n${d}`); // Added HL details
-                  text += `\nOIL: ${counts.OIL}`; // Added OIL
-                  details.OIL.forEach(d => text += `\n${d}`); // Added OIL details
-                  text += `\nLEAVE: ${counts.LEAVE}`;
-                  details.LEAVE.forEach(d => text += `\n${d}`);
-                  text += `\nOTH: ${counts.OTH}`; // Added OTH
-                  details.OTH.forEach(d => text += `\n${d}`); // Added OTH details
-                  text += `\nLATE: ${counts.LATE}`;
-                  details.LATE.forEach(d => text += `\n${d}`);
-                  text += `\nPresent Strength: ${presentCount}`;
-
-                  output.textContent = text;
-                  btnText.textContent = "🔄 Generate Parade State";
-                });
-            });
-        })
-        .catch(err => {
-          console.error("Error generating parade state:", err);
-          output.textContent = "Error loading parade state.";
-          btnText.textContent = "🔄 Generate Parade State";
-        });
-    }
-
-
-    // --- Missing Attendance ---
-    function generateMissingList() {
-      const output = document.getElementById('missingOutput');
-      const btnText = document.getElementById('missingBtnText');
-      
-      // Show loading state
-      output.textContent = "Loading...";
-      btnText.innerHTML = '<span class="loading-spinner"></span> Generating...';
-      
-      const today = new Date();
-      const todayStr = `${today.getDate().toString().padStart(2,'0')}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getFullYear()}`;
-
-      db.collection("users").get().then(userSnap => {
-        const allUsers = userSnap.docs.map(d => ({ uid: d.id, name: d.data().name }));
-        
-        return db.collection("attendance_logs")
-          .orderBy("timestamp", "desc") // Order by timestamp descending
-          .get()
-          .then(logSnap => {
-             // Group logs by UID and take the first one (latest due to order)
-             const latestLogsByUid = {};
-             logSnap.forEach(doc => {
-                 const data = doc.data();
-                 const uid = data.uid;
-                 if (!latestLogsByUid[uid]) {
-                     latestLogsByUid[uid] = data;
-                 }
-             });
-
-             const presentUids = new Set();
-
-             // Iterate through latest logs to determine who is present today
-             Object.values(latestLogsByUid).forEach(log => {
-                 // Check if the log's date range includes today (or if it's a same-day submission)
-                 const isSameDaySubmission = log.date === todayStr;
-                 const isInRange = log.startDate && log.endDate;
-                 const isActiveToday = isSameDaySubmission || (
-                     new Date(log.startDate).getTime() <= today.getTime() &&
-                     new Date(log.endDate).getTime() >= today.getTime()
-                 );
-
-                 if (isActiveToday) {
-                     presentUids.add(log.uid); // Add UID if active today
-                 }
-             });
-
-             const missing = allUsers.filter(u => !presentUids.has(u.uid)).map(u => u.name);
-             
-            output.textContent = missing.length > 0 
-              ? missing.join('\n') 
-              : "All personnel have submitted.";
-              
-            btnText.textContent = "🔄 Generate Missing List";
-          });
-      }).catch(err => {
-        console.error("Error loading missing list:", err);
-        output.textContent = "Error loading missing list.";
-        btnText.textContent = "🔄 Generate Missing List";
-      });
-    }
-
-    // --- Clipboard Functions ---
-    function copyParadeState() {
-      navigator.clipboard.writeText(document.getElementById('paradeOutput').textContent)
-        .then(() => showToast("📋 Copied!"));
-    }
-
-    function copyMissingList() {
-      navigator.clipboard.writeText(document.getElementById('missingOutput').textContent)
-        .then(() => showToast("📋 Copied!"));
-    }
-
-    // Auto-login handling - persists across page refreshes
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is logged in, try to load their profile
-        db.collection("users").doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            currentUser = { 
-              uid: user.uid, 
-              email: user.email, 
-              name: data.name, 
-              role: "trainee" 
-            };
-            initApp();
-          } else {
-            // New user who just registered
-            currentUser = { uid: user.uid, email: user.email };
-            showScreen('registerScreen');
-          }
-        }).catch(err => {
-          console.error("Error loading user ", err);
-          showToast("Failed to load user data", true);
-        });
-      } else {
-        // User is not logged in
-        showScreen('loginScreen');
-      }
-    });
-  </script>
-</body>
-</html>
+      }).then(() => 
